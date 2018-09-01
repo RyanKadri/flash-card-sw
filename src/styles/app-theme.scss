@@ -1,0 +1,14 @@
+@import '~@angular/material/theming';
+@import './mat-palette.scss';
+@import './custom-components.theme';
+
+@include mat-core();
+
+$app-primary: mat-palette($md-primary, 500, 200, 700);
+$app-accent: mat-palette($md-secondary, 500, 100, 700);
+$app-warn: mat-palette($md-warn);
+
+$app-theme: mat-light-theme($app-primary, $app-accent, $app-warn);
+
+@include angular-material-theme($app-theme);
+@include color-classes($app-theme);

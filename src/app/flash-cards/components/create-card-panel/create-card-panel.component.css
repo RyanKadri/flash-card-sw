@@ -1,7 +1,13 @@
 :host {
-    min-width: 400px;
+    min-width: 40%;
     padding: 10px 20px;
     background-color: #fff;
+}
+
+@media (max-width: 500px) {
+    :host {
+        width: 100%;
+    }
 }
 
 .header {

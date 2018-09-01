@@ -1,0 +1,29 @@
+@mixin color-classes($theme) {
+    $primary: map-get($theme, primary);
+    $secondary: map-get($theme, accent);
+
+    .color-primary {
+        background-color: var(--primary-background);
+        color: var(--primary-text-color);
+    }
+    
+    .color-primary-light {
+        background-color: var(--primary-background-light);
+        color: black;
+    }
+    
+    :root {
+        --top-nav-height: 51px;
+        --secondary-text-color: black;
+        --panel-text-color: rgba(0,0,0,0.87);
+        --primary-text-color: white;
+        
+        --primary-background: #{ mat-color($primary) };
+        --primary-background-light: #{ mat-color($primary, lighter) };
+        --primary-background-dark: #{ mat-color($primary, darker) };
+        
+        --secondary-background: #{ mat-color($secondary) };
+        --secondary-background-light: #{ mat-color($secondary, 300) };
+        --secondary-background-dark: #{ mat-color($secondary, 700) };
+    }
+}

@@ -1,0 +1,23 @@
+<mat-sidenav-container>
+    <mat-sidenav mode="over" #sidenav>
+        Sidebar
+    </mat-sidenav>
+    <mat-sidenav-content>
+        <div class="top-nav">
+            <h3 class="logo">
+                <button mat-icon-button (click)="sidenav.toggle()">
+                    <mat-icon>menu</mat-icon>
+                </button>
+            </h3> 
+            <h3>Kepler</h3>
+            <button class="primary-action-icon" mat-icon-button
+                    (click)="primaryAction()" [matTooltip]="actionDesc"
+                    [disabled]="actionDisabled">
+                <mat-icon>{{ actionIcon }}</mat-icon>
+            </button>
+        </div>
+        <main class="main-container">
+            <router-outlet></router-outlet>    
+        </main>
+    </mat-sidenav-content>
+</mat-sidenav-container>

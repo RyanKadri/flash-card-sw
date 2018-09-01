@@ -1,0 +1,12 @@
+@import './app-theme';
+
+body {
+    margin: 0px;
+    padding: 0px;
+    font-family: Roboto,sans-serif;
+    color: var(--panel-text-color);
+}
+
+@media (max-width: 500px) {
+    padding: 10px;
+}

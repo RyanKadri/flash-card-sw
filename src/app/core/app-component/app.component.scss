@@ -1,0 +1,33 @@
+:host {
+    display: block;
+    min-height: 100vh;
+}
+
+main {
+    min-height: calc(100vh - var(--top-nav-height));
+    margin-top: var(--top-nav-height);
+}
+
+.top-nav {
+    display: flex;
+    align-items: center;
+    height: var(--top-nav-height);
+    background-color: #2e7d32;
+    z-index: 50;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    color: white;
+    
+    .logo {
+        display: inline-block;
+    }
+    h3 {
+        color: var(--primary-text-color);
+        font-weight: 400;
+    }
+    .primary-action-icon {
+        margin-left: auto;
+    }
+}

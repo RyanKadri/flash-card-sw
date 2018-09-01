@@ -1,22 +1,25 @@
 :host {
     display: flex;
     width:100%;
-    padding: 16px;
-    background: #60ad5e;
+    padding: 8px;
 }
 
 .name-input-container {
     padding: 8px;
-    background-color: white;
     border-radius: 2px;
-    width: 40%;
-    border: solid 1px #ccc;
+    border-bottom: solid 1px var(--primary-background-dark);
+    max-width: 600px;
+    width: 100%;
 }
 
 .name-input {
     border: none;
     background-color: transparent;
-    font-size: 18px;
+    font-size: 1em;
     outline: none;
     width: 100%;
+}
+
+.save-button {
+    margin-left:auto;
 }

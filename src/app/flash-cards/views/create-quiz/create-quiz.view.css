@@ -5,7 +5,7 @@
 }
 
 .quiz-body {
-    padding: 20px;
+    padding: 24px 8px;
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
@@ -18,4 +18,10 @@
     grid-template-columns: 1fr 1fr 1fr;
     grid-gap: 10px;
     align-items: start;
+}
+
+@media (max-width: 500px) {
+    .card-section {
+        grid-template-columns: 1fr;
+    }
 }

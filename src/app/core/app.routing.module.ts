@@ -1,6 +1,6 @@
 import { NgModule } from "@angular/core";
 import { RouterModule, Routes } from "@angular/router";
-import { CreateQuizView } from "../flash-cards/views/create-quiz.view";
+import { CreateQuizView } from "../flash-cards/views/create-quiz/create-quiz.view";
 
 const routes : Routes = [
     { path: 'create', component: CreateQuizView },

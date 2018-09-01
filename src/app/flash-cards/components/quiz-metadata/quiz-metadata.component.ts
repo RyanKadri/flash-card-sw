@@ -1,4 +1,4 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { QuizMetadata } from '../../types/flash-card.types';
 
 @Component({
@@ -6,12 +6,12 @@ import { QuizMetadata } from '../../types/flash-card.types';
   templateUrl: './quiz-metadata.component.html',
   styleUrls: ['./quiz-metadata.component.css']
 })
-export class QuizMetadataComponent implements OnInit {
+export class QuizMetadataComponent {
 
   @Input()
-  quizMetaData: QuizMetadata
+  quizMetaData: QuizMetadata;
 
-  ngOnInit() {
-  }
+  @Output()
+  quizMetaDataChange = new EventEmitter<QuizMetadata>();
 
 }
