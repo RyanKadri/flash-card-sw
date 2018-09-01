@@ -1,0 +1,22 @@
+:host {
+    display: flex;
+    width:100%;
+    padding: 16px;
+    background: #60ad5e;
+}
+
+.name-input-container {
+    padding: 8px;
+    background-color: white;
+    border-radius: 2px;
+    width: 40%;
+    border: solid 1px #ccc;
+}
+
+.name-input {
+    border: none;
+    background-color: transparent;
+    font-size: 18px;
+    outline: none;
+    width: 100%;
+}

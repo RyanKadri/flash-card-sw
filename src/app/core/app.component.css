@@ -1,0 +1,10 @@
+:host {
+    display: block;
+    min-height: 100vh;
+    background-color: #f3f5f9;
+}
+
+main {
+    min-height: calc(100vh - var(--top-nav-height));
+    margin-top: var(--top-nav-height);
+}

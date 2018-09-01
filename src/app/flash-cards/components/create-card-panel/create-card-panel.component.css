@@ -1,0 +1,18 @@
+:host {
+    min-width: 400px;
+    padding: 10px 20px;
+    background-color: #fff;
+}
+
+.header {
+    display: flex;
+    align-items: center;
+}
+
+mat-form-field {
+    width: 100%;
+}
+
+.action-icons {
+    margin-left: auto;
+}

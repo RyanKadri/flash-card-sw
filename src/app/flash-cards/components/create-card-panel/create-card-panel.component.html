@@ -1,0 +1,17 @@
+<div class="header">
+    <div class="title">{{ questionSide ? "Question" : "Answer" }}</div>
+    <div class="action-icons">
+        <button mat-icon-button>
+            <mat-icon (click)="clearCard()">delete</mat-icon>
+        </button>
+        <button mat-icon-button>
+            <mat-icon (click)="flipCard()">refresh</mat-icon>
+        </button>
+    </div>
+</div>
+<mat-form-field>
+    <input autofocus name="question" matInput 
+           [placeholder]="questionSide ? 'Term' : 'Definition'"
+           (keyup.enter)="attemptSubmit();"
+           [(ngModel)]="formVal">
+</mat-form-field>

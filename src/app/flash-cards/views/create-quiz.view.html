@@ -1,0 +1,9 @@
+<quiz-metadata [(quizMetaData)]="quizMetaData"></quiz-metadata>
+<div class="quiz-body">
+    <create-card-panel class="mat-elevation-z3" (create)="createCard($event)"></create-card-panel>
+    <section class="card-section">
+        <ng-container *ngFor="let card of cards; trackBy: trackByCard">
+            <flash-card-panel class="mat-elevation-z3" [cardInfo]="card"></flash-card-panel>
+        </ng-container>
+    </section> 
+</div>

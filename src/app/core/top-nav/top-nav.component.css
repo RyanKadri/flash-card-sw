@@ -1,0 +1,33 @@
+:host {
+    display: flex;
+    align-items: center;
+    height: var(--top-nav-height);
+    background-color: #2e7d32;
+    z-index: 50;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+}
+.logo {
+    display: inline-block;
+    margin: 0 20px;
+}
+.nav-item, .logo {
+    display: block;
+    color: #fff;
+}
+.nav-item {
+    margin: 0 10px;
+    padding: 0;
+    font-size: 17px;
+    display: inline;
+}
+.nav-group {
+    margin: 0;
+    padding: 0;
+}
+a {
+    color: inherit;
+    text-decoration: none;
+}

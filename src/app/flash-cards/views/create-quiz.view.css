@@ -1,0 +1,21 @@
+:host {
+    display: flex;
+    flex-wrap: wrap;
+    min-height: 100%;
+}
+
+.quiz-body {
+    padding: 20px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.card-section {
+    padding: 30px 0px;
+    flex-basis: 100%;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-gap: 10px;
+    align-items: start;
+}
