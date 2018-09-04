@@ -3,7 +3,10 @@
     <create-card-panel class="mat-elevation-z3" (create)="createCard($event)"></create-card-panel>
     <section class="card-section">
         <ng-container *ngFor="let card of cards; trackBy: trackByCard">
-            <flash-card-panel class="mat-elevation-z3" [cardInfo]="card"></flash-card-panel>
+            <flash-card-panel class="mat-elevation-z3" [ngClass]="{ highlighted: isHighlighted(card) }"
+                [cardInfo]="card"
+                (press)="highlight(card)">
+            </flash-card-panel>
         </ng-container>
     </section> 
 </div>

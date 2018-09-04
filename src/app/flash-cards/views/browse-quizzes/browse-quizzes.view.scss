@@ -1,0 +1,11 @@
+:host {
+    padding: 8px;
+    display: block;
+}
+
+.quiz-selection-area {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-gap: 16px;
+    align-items: flex-start;
+}

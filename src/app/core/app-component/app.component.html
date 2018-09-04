@@ -1,6 +1,6 @@
 <mat-sidenav-container>
     <mat-sidenav mode="over" #sidenav>
-        Sidebar
+        <side-nav (close)="sidenav.close()"></side-nav>
     </mat-sidenav>
     <mat-sidenav-content>
         <div class="top-nav">

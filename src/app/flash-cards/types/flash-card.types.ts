@@ -1,6 +1,7 @@
 export interface FlashCardInfo {
     question: string;
     answer: string;
+    id?: number;
 }
 
 export interface QuizMetadata {

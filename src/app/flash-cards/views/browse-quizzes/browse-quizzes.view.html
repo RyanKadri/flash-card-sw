@@ -1,0 +1,16 @@
+<h3>Available Quizzes</h3>
+<div class="quiz-selection-area">
+  <mat-card class="quiz-card" *ngFor="let quiz of $quizzes | async">
+    <mat-card-header>
+      <mat-card-title>{{ quiz.name }}</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <p>
+        This quiz contains {{quiz.cards.length}} cards!
+      </p>
+    </mat-card-content>
+    <mat-card-actions>
+      <button mat-button>Play</button>
+    </mat-card-actions>
+  </mat-card>
+</div>

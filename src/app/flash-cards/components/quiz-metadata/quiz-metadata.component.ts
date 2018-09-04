@@ -4,7 +4,7 @@ import { QuizMetadata } from '../../types/flash-card.types';
 @Component({
   selector: 'quiz-metadata',
   templateUrl: './quiz-metadata.component.html',
-  styleUrls: ['./quiz-metadata.component.css']
+  styleUrls: ['./quiz-metadata.component.scss']
 })
 export class QuizMetadataComponent {
 

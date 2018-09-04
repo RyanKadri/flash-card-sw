@@ -11,6 +11,10 @@ import { CreateCardPanel } from './flash-cards/components/create-card-panel/crea
 import { FlashCardPanel } from './flash-cards/components/flash-card-panel/flash-card-panel.component';
 import { FormsModule } from '@angular/forms';
 import { QuizMetadataComponent } from './flash-cards/components/quiz-metadata/quiz-metadata.component';
+import { BrowseQuizzesView } from './flash-cards/views/browse-quizzes/browse-quizzes.view';
+import { SideNavComponent } from './core/side-nav/side-nav/side-nav.component';
+import { ServiceWorkerModule } from '@angular/service-worker';
+import { environment } from '../environments/environment';
 
 @NgModule({
   imports: [
@@ -19,7 +23,8 @@ import { QuizMetadataComponent } from './flash-cards/components/quiz-metadata/qu
     AppRoutingModule,
     RouterModule,
     BrowserAnimationsModule,
-    FormsModule
+    FormsModule,
+    ServiceWorkerModule.register('/ngsw-worker.js', { enabled: environment.production })
   ],
   declarations: [
     AppComponent,
@@ -27,6 +32,8 @@ import { QuizMetadataComponent } from './flash-cards/components/quiz-metadata/qu
     CreateCardPanel,
     FlashCardPanel,
     QuizMetadataComponent,
+    BrowseQuizzesView,
+    SideNavComponent,
   ],
   providers: [],
   bootstrap: [AppComponent]

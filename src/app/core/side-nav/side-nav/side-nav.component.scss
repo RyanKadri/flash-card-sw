@@ -1,0 +1,21 @@
+:host {
+    width: 300px;
+    background-color: #fafafa;
+    display: flex;
+    flex-direction: column;
+}
+.side-nav-header {
+    flex-basis: 160px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: flex-start;
+
+    h2 {
+        margin: 16px;
+        font-weight: 400;
+    }
+}
+
+a[mat-list-item] {
+    text-decoration: none;
+}

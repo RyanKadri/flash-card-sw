@@ -18,6 +18,10 @@
     font-size: 1em;
     outline: none;
     width: 100%;
+    
+    &::placeholder {
+        color: var(--panel-text-color);
+    }
 }
 
 .save-button {
