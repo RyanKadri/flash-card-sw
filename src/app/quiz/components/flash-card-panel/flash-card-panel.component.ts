@@ -1,6 +1,5 @@
 import { Component, Input, HostListener } from "@angular/core";
 import { FlashCardInfo } from "../../types/flash-card.types";
-import { PrimaryActionService } from "../../../core/services/primary-action.service";
 
 @Component({
     selector: 'flash-card-panel',
@@ -10,7 +9,6 @@ import { PrimaryActionService } from "../../../core/services/primary-action.serv
 export class FlashCardPanel {
 
     constructor(
-        private primaryActionService: PrimaryActionService
     ){}
 
     @Input()

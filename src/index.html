@@ -14,12 +14,51 @@
   <meta name="theme-color" content="#1976d2">
 </head>
 <body class="mat-app-background">
-  <noscript>
-    <h3>Sorry. No</h3>
-  </noscript>
   <app-root>
-    <nav style="background-color: #2e7c31; width: 100%; height: 51px"></nav>
-    <span>Loading Yo!</span>
+    <style>
+      body {
+        margin: 0px;
+        min-height: 100vh;
+        background-color: #fafafa;
+      }
+      main {
+        padding: 16px;
+        height: calc(100vh - 51px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      nav {
+        background-color: #2e7c31;
+        width: 100%;
+        height: 51px;
+        display: flex;
+        align-items: center;
+        padding-left: 40px;
+        color: white;
+      }
+      h3 {
+        margin: 0;
+        font-weight: 400;
+        font-family: Roboto, Helvetica;
+      }
+    </style>
+    <noscript>
+      <style>
+        .js-enabled {
+          display: none;
+        }
+      </style>
+    </noscript>
+    <nav>
+      <h3>Kepler</h3>
+    </nav>
+    <main>
+      <noscript>
+        <h3>Sorry. You must have JavaScript enabled to run this app</h3>
+      </noscript>
+      <h3 class="js-enabled">Loading</h3>
+    </main>
   </app-root>
 </body>
 </html>
