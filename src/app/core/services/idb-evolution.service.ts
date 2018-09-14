@@ -36,7 +36,7 @@ export class IdbEvolutionService {
         for(const step of upgradeSteps) {
             switch(step.type) {
                 case 'create-store':
-                    upgrader.createObjectStore(step.store);
+                    upgrader.createObjectStore(step.store, { keyPath: step.index });
                     break;
                 case 'remove-store':
                     upgrader.deleteObjectStore(step.store);
@@ -49,12 +49,13 @@ export class IdbEvolutionService {
 type DatabaseEvolutionStep = CreateObjectStore<any> | RemoveObjectStore;
 
 class CreateObjectStore<T extends HasId> {
-    type = "create-store";
+    type : "create-store" = "create-store";
     database: string;
     store: string;
 
     constructor(
-        schema: PersistenceSchema<T>
+        schema: PersistenceSchema<T>,
+        public index = "id"
     ) { 
         this.database = schema.idbDatabase;
         this.store = schema.idbObjectStore;
@@ -62,7 +63,7 @@ class CreateObjectStore<T extends HasId> {
 }
 
 class RemoveObjectStore {
-    type = "remove-store";
+    type : "remove-store" = "remove-store";
     constructor(
         public database: string,
         public store: string

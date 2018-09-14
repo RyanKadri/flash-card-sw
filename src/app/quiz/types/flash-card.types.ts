@@ -6,12 +6,15 @@ export interface FlashCardInfo {
 
 export interface QuizMetadata {
     name: string;
+    description: string;
     categories: string[] //TODO - For now
 }
 
 export interface QuizInfo {
-    id: number;
+    id: string;
     name: string;
+    description: string;
+    createdOn: number;
     tags: string[];
     cards: FlashCardInfo[];
 }

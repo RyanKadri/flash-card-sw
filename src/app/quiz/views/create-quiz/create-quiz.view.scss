@@ -2,6 +2,8 @@
     display: flex;
     flex-wrap: wrap;
     min-height: 100%;
+    padding: 0px;
+    align-items: start;
 }
 
 .quiz-body {
@@ -9,7 +11,7 @@
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    width: 100%;
+    flex-grow: 1;
 }
 
 .card-section {
@@ -25,8 +27,44 @@ flash-card-panel.highlighted {
     background-color: #dddddd;
 }
 
+.metadata-area {
+    display: flex;
+    flex-direction: column;
+    padding: 16px;
+    height: calc(100vh - var(--top-nav-height));
+    width: 300px;
+    background-color: #fff;
+    
+    mat-form-field {
+        width: 100%;
+    }
+}
+
+.save-button {
+    align-self: flex-end;
+    margin-top: 24px;
+}
+
 @media (max-width: 500px) {
     .card-section {
         grid-template-columns: 1fr;
+    }
+    .metadata-area {
+        box-sizing: border-box;
+        height: 100vh;
+        position: fixed;
+        width: 100vw;
+        z-index: 99;
+        transition: transform 300ms ease-in, opacity 300ms ease-in;
+        transform-origin: top;
+    }
+    .metadata-area.collapse {
+        transform: scaleY(0);
+        opacity: 0;
+    }
+}
+@media (min-width: 501px) {
+    .metadata-area.collapse {
+        display: none;
     }
 }

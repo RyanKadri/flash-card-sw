@@ -20,7 +20,12 @@ export class QuizService {
         return this.persistenceService.fetch(this.quizSchema, {}, { source: FetchSource.LOCAL_FIRST });
     }
 
-    createQuiz(quiz: QuizInfo) {
-        return this.persistenceService.persist([quiz], this.quizSchema, { shouldPublish: false });
+    fetchQuiz(id: number) {
+        return this.persistenceService.fetch(this.quizSchema, { id }, { source: FetchSource.LOCAL_FIRST });
+    }
+
+    createQuiz(quiz: Partial<QuizInfo>) {
+        const toPersist = { ...quiz, createdOn: Date.now() }
+        return this.persistenceService.persist([toPersist], this.quizSchema, { shouldPublish: false });
     }
 }

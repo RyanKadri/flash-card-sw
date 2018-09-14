@@ -1,0 +1,43 @@
+.flash-card {
+    display: flex;
+    width: 95%;
+    max-width: 600px;
+    box-sizing: border-box;
+    min-height: 70vh;
+    background-color: white;
+    justify-content: center;
+    align-items: center;
+    margin-top: auto;
+    margin-bottom: auto;
+    flex-wrap: wrap;
+}
+
+.term, .definition {
+    font-size: 3em;
+    font-weight: 400;
+    margin-top: auto;
+}
+
+.definition {
+    transform: rotateY(180deg);
+}
+
+.card-controls {
+    margin-top: auto;
+    flex-basis: 100%;
+    margin: auto 8px 0 8px;
+    button:last-child {
+        float: right;
+    }
+}
+
+.back-side .card-controls {
+    transform: rotateY(180deg);
+}
+
+:host {
+    flex-grow: 1;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+}

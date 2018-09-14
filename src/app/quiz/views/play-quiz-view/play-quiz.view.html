@@ -1,0 +1,13 @@
+<aside class="quiz-info mat-elevation-z3">
+  <h3>{{ quiz.name }}</h3>
+  <p class="description">{{ quiz.description }}</p>
+  <mat-chip-list *ngIf="quiz.tags.length > 0">
+    <mat-chip *ngFor="let tag of quiz.tags">{{ tag }}</mat-chip>
+  </mat-chip-list>
+</aside>
+<quiz-game-area [(currentCard)]="currentCard" [cards]="quiz.cards"></quiz-game-area>
+<footer class="progress-bar">
+  <div class="variable-bar color-accent" 
+    [ngStyle]="{ transform: 'scaleX(' + percentComplete + ')'}">
+  </div>
+</footer>

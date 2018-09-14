@@ -1,11 +1,41 @@
+@import 'responsive-breaks.scss';
+
 :host {
     padding: 8px;
-    display: block;
+}
+
+.quiz-card {
+    padding: 16px;
+    cursor: pointer;
+    border-top: solid 4px transparent;
+    &:hover {
+        border-color: var(--primary-background-light);
+    }
+
+    h3 {
+        padding-bottom: 8px;
+    }
+    small {
+        margin-left: 8px;
+    }
+}
+
+.section-header {
+    margin: 16px 8px;
 }
 
 .quiz-selection-area {
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
     grid-gap: 16px;
     align-items: flex-start;
+
+    @include respond-to(small) {
+        grid-template-columns: 1fr;
+    }
+    @include respond-to(medium) {
+        grid-template-columns: 1fr 1fr;
+    }
+    @include respond-to(wide) {
+        grid-template-columns: 1fr 1fr 1fr;;
+    }
 }

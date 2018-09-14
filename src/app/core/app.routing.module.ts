@@ -4,13 +4,18 @@ import { CreateQuizView } from "../quiz/views/create-quiz/create-quiz.view";
 import { BrowseQuizzesView } from "../quiz/views/browse-quizzes/browse-quizzes.view";
 import { QuizResolver } from "../quiz/services/quiz-resolver.service";
 import { InitResolver } from "./services/init-resolver";
+import { PageNotFoundView } from "./views/page-not-found/page-not-found.component";
+import { PlayQuizView } from "../quiz/views/play-quiz-view/play-quiz.view";
+import { PlayQuizResolver } from "../quiz/services/play-quiz.resolver";
 
 const routes : Routes = [
     { path: '', resolve: [ InitResolver ], children: [
         { path: 'create', component: CreateQuizView },
         { path: 'browse', component: BrowseQuizzesView, resolve: [ QuizResolver ]},
-        { path: '**', redirectTo: 'browse' }
+        { path: 'play/:quizId', component: PlayQuizView, resolve: [ PlayQuizResolver ]}
     ]},
+    { path: '', pathMatch: 'full', redirectTo: 'browse' },
+    { path: '**', component: PageNotFoundView }
 ]
 
 @NgModule({

@@ -1,3 +1,5 @@
-<div class="name-input-container">
-  <input type="text" class="name-input" placeholder="Quiz Name" [(ngModel)]="quizMetaData.name">
-</div>
+<h3 class="title">{{ quizMetaData.name }}</h3>
+<section class="header-icons">
+  <button mat-icon-button><mat-icon [inline]="true" (click)="edit.emit()">edit</mat-icon></button>
+  <button mat-icon-button><mat-icon [inline]="true" (click)="save.emit()">check</mat-icon></button>
+</section>

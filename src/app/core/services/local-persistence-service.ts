@@ -46,11 +46,20 @@ export class LocalPersistenceService implements PersistenceProvider {
         const db = await idb.open(schema.idbDatabase, this.databaseVersion);
         const tx = db.transaction(schema.idbObjectStore, 'readonly');
         const store = tx.objectStore(schema.idbObjectStore);
-        const quizzes = await store.getAll() as T[];
+        let result;
+        if(Object.keys(criteria).length === 0) {
+            result = await store.getAll() as T[];
+        } else {
+            if(criteria.id) {
+                result = await store.get(criteria.id);
+            } else {
+                throw new Error('Not sure yet how to make generic queries')
+            }
+        }
         await tx.complete;
         db.close();
         return {
-            result: quizzes,
+            result,
             status: FetchStatus.OK
         };
     }

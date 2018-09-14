@@ -1,0 +1,55 @@
+@import 'responsive-breaks.scss';
+
+:host {
+    padding: 0;
+    display: grid;
+    background-color: #f0f0f0;
+}
+
+.progress-bar {
+    grid-area: progress;
+    
+    .variable-bar {
+        transition: transform 150ms ease-out;
+        transform-origin: left;
+        height: 100%;
+    }
+}
+
+.quiz-info {
+    padding: 8px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    background-color: #fff;
+    grid-area: quiz-data;
+
+    .description {
+        margin-top: 10px;
+    }
+    mat-chip-list {
+        margin-top: auto;
+    }
+}
+
+quiz-game-area {
+    grid-area: quiz-game;
+}
+
+@include respond-to(small) {
+    :host {
+        grid-template-areas: "quiz-data" "quiz-game" "progress";
+        grid-template-rows: auto 1fr 3px;
+    }
+    .description, mat-chip-list {
+        display: none;
+    }
+}
+
+@media(min-width: $small-width + 1) {
+    :host {
+        grid-template-areas: "quiz-data quiz-game" "progress progress";
+        grid-template-rows: 1fr 3px;
+        grid-template-columns: 250px 1fr;
+    }
+}

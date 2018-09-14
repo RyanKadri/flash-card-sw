@@ -1,8 +1,9 @@
 import { Component, OnInit } from "@angular/core";
 import { FlashCardInfo, QuizMetadata } from "../../types/flash-card.types";
-import { Title } from "@angular/platform-browser";
 import { Router } from "@angular/router";
 import { QuizService } from "../../services/quiz.service";
+import { MatChipInputEvent } from "@angular/material";
+import { ENTER, COMMA } from '@angular/cdk/keycodes'
 
 @Component({
     selector: 'create-quiz-view',
@@ -13,26 +14,41 @@ export class CreateQuizView implements OnInit {
 
     constructor(
         private quizService: QuizService,
-        private title: Title,
         private router: Router
     ) { }
 
+    editing = true;
+
     cards: FlashCardInfo[] = [];
 
-    quizMetaData: QuizMetadata = {
+    metadata: QuizMetadata = { 
         name: "",
+        description: "",
         categories: []
     }
 
     selectedCards = new Set<FlashCardInfo>();
 
+    largeScreen: boolean = false;
+
+    readonly separatorKeyCodes = [ ENTER, COMMA ]
+
     ngOnInit() {
-        this.title.setTitle('Create Quiz')
+        const media = matchMedia('(min-width: 700px)');
+        this.largeScreen = media.matches;
+        media.addListener((evt) => {
+            this.largeScreen = evt.matches;
+        });
+    }
+
+    edit() {
+        this.editing = true;
     }
 
     createQuiz() {
         this.quizService.createQuiz(
-            { cards: this.cards, name: this.quizMetaData.name, tags: [], id: undefined }
+            {  name: this.metadata.name, description: this.metadata.description,
+                cards: this.cards, tags: this.metadata.categories }
         );
         this.router.navigate(['/browse'])
     }
@@ -57,5 +73,20 @@ export class CreateQuizView implements OnInit {
 
     trackByCard(card: FlashCardInfo) {
         return card.id;
+    }
+
+    addTag(e: MatChipInputEvent) {
+        const input = e.input;
+        const val = e.value;
+        if(val) {
+            this.metadata.categories = this.metadata.categories.concat(val);
+        }
+        if(input) {
+            input.value = '';
+        }
+    }
+
+    removeTag(tag: string) {
+        this.metadata.categories = this.metadata.categories.filter(cat => cat === tag);
     }
 }

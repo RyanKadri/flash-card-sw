@@ -16,6 +16,9 @@ import { SideNavComponent } from './core/side-nav/side-nav/side-nav.component';
 import { ServiceWorkerModule } from '@angular/service-worker';
 import { environment } from '../environments/environment';
 import { HttpClientModule } from '@angular/common/http';
+import { PlayQuizView } from './quiz/views/play-quiz-view/play-quiz.view';
+import { PageNotFoundView } from './core/views/page-not-found/page-not-found.component';
+import { QuizGameCardComponent } from './quiz/components/quiz-game-area/quiz-game-area.component';
 
 @NgModule({
   imports: [
@@ -36,6 +39,11 @@ import { HttpClientModule } from '@angular/common/http';
     QuizMetadataComponent,
     BrowseQuizzesView,
     SideNavComponent,
+    PlayQuizView,
+    PageNotFoundView,
+    QuizGameCardComponent
+  ],
+  entryComponents: [
   ],
   providers: [],
   bootstrap: [AppComponent]

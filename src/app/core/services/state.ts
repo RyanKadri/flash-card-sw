@@ -22,9 +22,9 @@ export abstract class State<StateType extends HasId> {
 }
 
 export interface IdMap<T> {
-    [id: number]: T;
+    [id: string]: T;
 }
 
 export interface HasId {
-    id: number;
+    id: number | string;
 }

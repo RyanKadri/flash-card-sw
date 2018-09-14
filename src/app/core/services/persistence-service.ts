@@ -92,6 +92,7 @@ export class PersistenceService {
             }
             return retryRes.result;
         } else {
+            schema.localState.upsert(...res);
             return res;
         }
     }

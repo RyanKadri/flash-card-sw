@@ -7,6 +7,20 @@ body {
     color: var(--panel-text-color);
 }
 
+h1, h2, h3, h4, p {
+    margin: 0;
+    font-weight: 400;
+}
+
+small {
+    opacity: 0.87;
+}
+
 @media (max-width: 500px) {
     padding: 10px;
+}
+
+router-outlet + *{
+    display: block;
+    height: calc(100vh - var(--top-nav-height));
 }

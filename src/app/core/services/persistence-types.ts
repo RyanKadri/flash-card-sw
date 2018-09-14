@@ -7,7 +7,7 @@ export interface FetchOptions {
 }
 
 export interface FetchCriteria<T> {
-
+    [field: string]: any
 }
 
 export interface PersistenceSchema<T extends HasId> {

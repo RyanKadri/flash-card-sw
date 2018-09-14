@@ -12,6 +12,9 @@ export class QuizMetadataComponent {
   quizMetaData: QuizMetadata;
 
   @Output()
-  quizMetaDataChange = new EventEmitter<QuizMetadata>();
+  edit = new EventEmitter<void>();
+
+  @Output()
+  save = new EventEmitter<void>();
 
 }

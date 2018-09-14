@@ -1,29 +1,23 @@
 :host {
     display: flex;
     width:100%;
-    padding: 8px;
+    padding: 16px;
+    color: var(--panel-text-color);
 }
 
-.name-input-container {
-    padding: 8px;
-    border-radius: 2px;
-    border-bottom: solid 1px var(--primary-background-dark);
-    max-width: 600px;
-    width: 100%;
-}
-
-.name-input {
-    border: none;
-    background-color: transparent;
+.title {
     font-size: 1em;
-    outline: none;
-    width: 100%;
-    
-    &::placeholder {
-        color: var(--panel-text-color);
-    }
+    margin: 0;
+    font-weight: 400;
 }
 
-.save-button {
+.header-icons {
     margin-left:auto;
+    .mat-icon-button {
+        height: 100%;
+        width: 20px;
+        line-height: 20px;
+        font-size: 20px;
+        margin-left: 8px;
+    }
 }

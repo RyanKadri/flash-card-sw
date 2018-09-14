@@ -14,6 +14,10 @@
           "spec": false,
           "viewEncapsulation": "Emulated",
           "changeDetection": "OnPush"
+        },
+        "@schematics/angular:service": {
+          "spec": false,
+          "flat": true
         }
       },
       "architect": {
@@ -33,6 +37,11 @@
             "styles": [
               "src/styles/main.scss"
             ],
+            "stylePreprocessorOptions": {
+              "includePaths": [
+                "src/styles"
+              ]
+            },
             "scripts": []
           },
           "configurations": {
