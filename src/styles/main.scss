@@ -22,5 +22,10 @@ small {
 
 router-outlet + *{
     display: block;
-    height: calc(100vh - var(--top-nav-height));
+}
+
+button[mat-icon-button].icon-button-small {
+    height: 30px;
+    width: 30px;
+    line-height: 30px;
 }

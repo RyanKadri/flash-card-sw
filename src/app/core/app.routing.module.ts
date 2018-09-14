@@ -6,13 +6,14 @@ import { QuizResolver } from "../quiz/services/quiz-resolver.service";
 import { InitResolver } from "./services/init-resolver";
 import { PageNotFoundView } from "./views/page-not-found/page-not-found.component";
 import { PlayQuizView } from "../quiz/views/play-quiz-view/play-quiz.view";
-import { PlayQuizResolver } from "../quiz/services/play-quiz.resolver";
+import { SingleQuizResolver } from "../quiz/services/single-quiz.resolver";
 
 const routes : Routes = [
     { path: '', resolve: [ InitResolver ], children: [
         { path: 'create', component: CreateQuizView },
         { path: 'browse', component: BrowseQuizzesView, resolve: [ QuizResolver ]},
-        { path: 'play/:quizId', component: PlayQuizView, resolve: [ PlayQuizResolver ]}
+        { path: 'play/:quizId', component: PlayQuizView, resolve: [ SingleQuizResolver ]},
+        { path: 'edit/:quizId', component: CreateQuizView, resolve: [ SingleQuizResolver ]}
     ]},
     { path: '', pathMatch: 'full', redirectTo: 'browse' },
     { path: '**', component: PageNotFoundView }

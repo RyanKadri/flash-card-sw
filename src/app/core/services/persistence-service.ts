@@ -30,7 +30,7 @@ export class PersistenceService {
 
     async persist<T>(toPersist: T[], schema: PersistenceSchema<T & HasId>, options?: Partial<PersistenceOptions>) {
         const fullOptions = { ...this.defaultPersistenceOptions, ...options }
-        const toPersistWithIds = toPersist.map(item => ({ ...item as any, id: uuidv4() })) as (T & HasId)[];
+        const toPersistWithIds = toPersist.map(item => item['id'] ? item : ({ ...item as any, id: uuidv4() })) as (T & HasId)[];
         schema.localState.upsert(...toPersistWithIds);
 
         const localPersist = this.localPersistenceService.persist(toPersistWithIds, schema);

@@ -28,4 +28,8 @@ export class QuizService {
         const toPersist = { ...quiz, createdOn: Date.now() }
         return this.persistenceService.persist([toPersist], this.quizSchema, { shouldPublish: false });
     }
+
+    saveQuiz(quiz: Partial<QuizInfo>) {
+        return this.persistenceService.persist([quiz], this.quizSchema, { shouldPublish: false })
+    }
 }

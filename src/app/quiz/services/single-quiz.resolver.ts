@@ -5,7 +5,7 @@ import { QuizService } from './quiz.service';
 @Injectable({
   providedIn: 'root'
 })
-export class PlayQuizResolver implements Resolve<void> {
+export class SingleQuizResolver implements Resolve<void> {
 
   constructor(
     private quizService: QuizService

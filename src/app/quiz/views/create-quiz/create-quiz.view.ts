@@ -1,9 +1,10 @@
 import { Component, OnInit } from "@angular/core";
-import { FlashCardInfo, QuizMetadata } from "../../types/flash-card.types";
-import { Router } from "@angular/router";
+import { FlashCardInfo, QuizMetadata, QuizInfo } from "../../types/flash-card.types";
+import { Router, ActivatedRoute } from "@angular/router";
 import { QuizService } from "../../services/quiz.service";
 import { MatChipInputEvent } from "@angular/material";
 import { ENTER, COMMA } from '@angular/cdk/keycodes'
+import { QuizState } from "../../services/quiz-state";
 
 @Component({
     selector: 'create-quiz-view',
@@ -14,17 +15,19 @@ export class CreateQuizView implements OnInit {
 
     constructor(
         private quizService: QuizService,
-        private router: Router
+        private quizState: QuizState,
+        private router: Router,
+        private route: ActivatedRoute
     ) { }
 
-    editing = true;
+    editMetadata = true;
+    editMode = false;
 
-    cards: FlashCardInfo[] = [];
-
-    metadata: QuizMetadata = { 
+    quiz: Partial<QuizInfo> = {
         name: "",
         description: "",
-        categories: []
+        tags: [],
+        cards: []
     }
 
     selectedCards = new Set<FlashCardInfo>();
@@ -39,17 +42,25 @@ export class CreateQuizView implements OnInit {
         media.addListener((evt) => {
             this.largeScreen = evt.matches;
         });
+        if(this.route.snapshot.params.quizId) {
+            this.quizState.select().subscribe(quizzes => {
+                this.quiz = quizzes.find(quiz => quiz.id === this.route.snapshot.params.quizId);
+                this.editMetadata = false;
+                this.editMode = true;
+            })
+        }
     }
 
     edit() {
-        this.editing = true;
+        this.editMetadata = true;
     }
 
-    createQuiz() {
-        this.quizService.createQuiz(
-            {  name: this.metadata.name, description: this.metadata.description,
-                cards: this.cards, tags: this.metadata.categories }
-        );
+    save() {
+        if(!this.editMode) {
+            this.quizService.createQuiz(this.quiz);
+        } else {
+            this.quizService.saveQuiz(this.quiz);
+        }
         this.router.navigate(['/browse'])
     }
 
@@ -58,7 +69,7 @@ export class CreateQuizView implements OnInit {
     }
 
     createCard(created: FlashCardInfo) {
-        this.cards.unshift({ ...created, id: this.cards.length });
+        this.quiz.cards.unshift({ ...created, id: this.quiz.cards.length });
     }
 
     highlight(card: FlashCardInfo) {
@@ -79,7 +90,7 @@ export class CreateQuizView implements OnInit {
         const input = e.input;
         const val = e.value;
         if(val) {
-            this.metadata.categories = this.metadata.categories.concat(val);
+            this.quiz.tags = this.quiz.tags.concat(val);
         }
         if(input) {
             input.value = '';
@@ -87,6 +98,6 @@ export class CreateQuizView implements OnInit {
     }
 
     removeTag(tag: string) {
-        this.metadata.categories = this.metadata.categories.filter(cat => cat === tag);
+        this.quiz.tags = this.quiz.tags.filter(cat => cat === tag);
     }
 }

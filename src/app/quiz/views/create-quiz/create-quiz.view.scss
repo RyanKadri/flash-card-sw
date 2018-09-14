@@ -34,6 +34,7 @@ flash-card-panel.highlighted {
     height: calc(100vh - var(--top-nav-height));
     width: 300px;
     background-color: #fff;
+    box-sizing: border-box;
     
     mat-form-field {
         width: 100%;

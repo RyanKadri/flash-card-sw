@@ -2,7 +2,14 @@
   <h3 class="section-header">Available Quizzes</h3>
   <div class="quiz-selection-area">
     <div (click)="playQuiz(quiz)" class="quiz-card mat-elevation-z3" *ngFor="let quiz of quizzes">
-      <h3 class="title">{{ quiz.name }} <small> {{ quiz.cards.length }} card{{ quiz.cards.length > 0 ? 's': ''}}</small></h3>
+      <header class="title">
+        <h3>{{ quiz.name }}</h3>
+        <small> {{ quiz.cards.length }} card{{ quiz.cards.length > 0 ? 's': ''}}</small>
+        <button mat-icon-button class="icon-button-small edit" 
+          (click)="edit(quiz); $event.stopPropagation()">
+          <mat-icon>edit</mat-icon>
+        </button>
+      </header>
       <div></div>
       <section>
         <p>{{ quiz.description }}</p>

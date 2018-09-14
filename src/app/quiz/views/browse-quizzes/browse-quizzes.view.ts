@@ -38,4 +38,8 @@ export class BrowseQuizzesView implements OnInit, OnDestroy {
     this.router.navigate(["/play", quiz.id])
   }
 
+  edit(quiz: QuizInfo) {
+    this.router.navigate(["/edit", quiz.id])
+  }
+
 }
