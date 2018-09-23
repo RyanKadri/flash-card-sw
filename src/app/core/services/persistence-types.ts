@@ -24,9 +24,17 @@ export interface SchemaUpgrade {
     upgrade: (upgrader: UpgradeDB) => void;
 }
 
-export interface PersistenceOptions {
+export interface PersistenceOptions extends MutationOptions{
+    
+}
+
+export interface DeleteOptions extends MutationOptions {
+
+}
+
+interface MutationOptions {
     shouldPublish: boolean;
-    guarantee: CompletionGuarantee
+    guarantee: CompletionGuarantee;
 }
 
 export enum CompletionGuarantee {

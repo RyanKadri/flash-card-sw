@@ -3,19 +3,23 @@ import { QuizState } from '../../services/quiz-state';
 import { Subscription } from 'rxjs';
 import { QuizInfo } from '../../types/flash-card.types';
 import { Router } from '@angular/router';
+import { QuizService } from '../../services/quiz.service';
+import { AlertService } from '../../../core/services/alert.service';
 
 @Component({
   selector: 'browse-quizzes-view',
   templateUrl: './browse-quizzes.view.html',
   styleUrls: ['./browse-quizzes.view.scss'],
   encapsulation: ViewEncapsulation.Emulated,
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.Default
 })
 export class BrowseQuizzesView implements OnInit, OnDestroy {
 
   constructor(
     private quizState: QuizState,
-    private router: Router
+    private router: Router,
+    private quizService: QuizService,
+    private alertService: AlertService
   ) { }
 
   quizzes: QuizInfo[] = [];
@@ -40,6 +44,16 @@ export class BrowseQuizzesView implements OnInit, OnDestroy {
 
   edit(quiz: QuizInfo) {
     this.router.navigate(["/edit", quiz.id])
+  }
+
+  delete(quiz: QuizInfo) {
+    this.alertService.showConfirmationAlert({ title: 'Are you sure you want to delete this quiz?'}, () => {
+      this.quizService.deleteQuiz(quiz);
+    });
+  }
+
+  createQuiz() {
+    this.router.navigate(['/create'])
   }
 
 }

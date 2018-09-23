@@ -3,13 +3,18 @@ import { LocalPersistenceService } from "./local-persistence-service";
 import { State, HasId } from "./state";
 import { RemotePersistenceService } from "./remote-persistence.service";
 import * as uuidv4 from 'uuid/v4'
-import { CompletionGuarantee, FetchSource, PersistenceSchema, PersistenceOptions, FetchCriteria, PersistenceProvider, FetchStatus, FetchResult, FetchOptions } from "./persistence-types";
+import { CompletionGuarantee, FetchSource, PersistenceSchema, PersistenceOptions, FetchCriteria, PersistenceProvider, FetchStatus, FetchResult, FetchOptions, DeleteOptions } from "./persistence-types";
 import { PersistenceSchemaService } from "./persistence-schema.service";
 
 @Injectable({ providedIn: 'root' })
 export class PersistenceService {
 
     private readonly defaultPersistenceOptions = {
+        guarantee: CompletionGuarantee.LOCAL_ONLY,
+        shouldPublish: false
+    }
+
+    private readonly defaultDeletionOptions = {
         guarantee: CompletionGuarantee.LOCAL_ONLY,
         shouldPublish: false
     }
@@ -94,6 +99,29 @@ export class PersistenceService {
         } else {
             schema.localState.upsert(...res);
             return res;
+        }
+    }
+
+    async delete<T extends HasId>(toDelete: T[], schema: PersistenceSchema<T & HasId>, options?: Partial<DeleteOptions>) {
+        const fullOptions = { ...this.defaultDeletionOptions, ...options }
+
+        schema.localState.delete( ...toDelete );
+
+        const localDelete = this.localPersistenceService.delete(toDelete, schema);
+        let remoteDelete: Promise<(T & HasId)[]>;
+        if(fullOptions.shouldPublish) {
+            remoteDelete = this.remotePersistenceService.delete(toDelete, schema);
+        }
+
+        switch(fullOptions.guarantee) {
+            case CompletionGuarantee.IN_MEMORY:
+                return Promise.resolve(toDelete);
+            case CompletionGuarantee.LOCAL_ONLY:
+                return localDelete;
+            case CompletionGuarantee.REMOTE_ONLY:
+                return remoteDelete;
+            case CompletionGuarantee.LOCAL_AND_REMOTE:
+                return Promise.all([localDelete, remoteDelete]).then(res => res[0]);
         }
     }
 

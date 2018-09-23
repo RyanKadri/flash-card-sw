@@ -64,6 +64,17 @@ export class LocalPersistenceService implements PersistenceProvider {
         };
     }
 
+    async delete<T extends HasId>(items: T[], schema: PersistenceSchema<T>) {
+        const db = await idb.open(schema.idbDatabase, this.databaseVersion);
+        const tx = db.transaction(schema.idbObjectStore, 'readwrite')
+        const store = tx.objectStore(schema.idbObjectStore);
+        const deletes = items.map(item => store.delete(item.id));
+        await Promise.all(deletes);
+        await tx.complete;
+        db.close();
+        return items;
+    }
+
     hasPersistentStorage() {
         return this.persistentStorage;
     }

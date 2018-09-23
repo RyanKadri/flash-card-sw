@@ -24,12 +24,15 @@ export class QuizService {
         return this.persistenceService.fetch(this.quizSchema, { id }, { source: FetchSource.LOCAL_FIRST });
     }
 
-    createQuiz(quiz: Partial<QuizInfo>) {
-        const toPersist = { ...quiz, createdOn: Date.now() }
-        return this.persistenceService.persist([toPersist], this.quizSchema, { shouldPublish: false });
+    saveQuiz(quiz: Partial<QuizInfo>) {
+        const toPersist = { ...quiz };
+        if(!quiz.createdOn) {
+            toPersist.createdOn = Date.now();
+        }
+        return this.persistenceService.persist([quiz], this.quizSchema, { shouldPublish: false })
     }
 
-    saveQuiz(quiz: Partial<QuizInfo>) {
-        return this.persistenceService.persist([quiz], this.quizSchema, { shouldPublish: false })
+    deleteQuiz(quiz: QuizInfo) {
+        this.persistenceService.delete([quiz], this.quizSchema, { shouldPublish: false })
     }
 }

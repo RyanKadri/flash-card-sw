@@ -10,7 +10,7 @@ export class RemotePersistenceService implements PersistenceProvider {
         private http: HttpClient
     ) {}
 
-    persist<T extends HasId>(toPersist: T[], schema: PersistenceSchema<T>): Promise<T[]> {
+    async persist<T extends HasId>(toPersist: T[], schema: PersistenceSchema<T>): Promise<T[]> {
         const url = schema.remoteResourceBulk;
         return this.http.put<T[]>(url, toPersist, { responseType: 'json' }).toPromise()
     }
@@ -19,5 +19,11 @@ export class RemotePersistenceService implements PersistenceProvider {
         const url = schema.remoteResourceBulk;
         const res = await this.http.get<T[]>(url).toPromise();
         return { result: res, status: FetchStatus.OK }
+    }
+
+    async delete<T extends HasId>(toPersist: T[], schema: PersistenceSchema<T>): Promise<T[]> {
+        if(toPersist.length > 1) throw new Error('Oops. Need to implement bulk delete');
+        const url = schema.remoteResource(toPersist[0]);
+        return this.http.delete<T[]>(url, { responseType: 'json' }).toPromise();
     }
 }

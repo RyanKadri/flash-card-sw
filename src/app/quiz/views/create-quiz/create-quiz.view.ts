@@ -56,11 +56,7 @@ export class CreateQuizView implements OnInit {
     }
 
     save() {
-        if(!this.editMode) {
-            this.quizService.createQuiz(this.quiz);
-        } else {
-            this.quizService.saveQuiz(this.quiz);
-        }
+        this.quizService.saveQuiz(this.quiz);
         this.router.navigate(['/browse'])
     }
 

@@ -19,6 +19,7 @@ import { HttpClientModule } from '@angular/common/http';
 import { PlayQuizView } from './quiz/views/play-quiz-view/play-quiz.view';
 import { PageNotFoundView } from './core/views/page-not-found/page-not-found.component';
 import { QuizGameCardComponent } from './quiz/components/quiz-game-area/quiz-game-area.component';
+import { ConfirmationDialogComponent } from './shared/confirmation-dialog/confirmation-dialog.component';
 
 @NgModule({
   imports: [
@@ -41,9 +42,11 @@ import { QuizGameCardComponent } from './quiz/components/quiz-game-area/quiz-gam
     SideNavComponent,
     PlayQuizView,
     PageNotFoundView,
-    QuizGameCardComponent
+    QuizGameCardComponent,
+    ConfirmationDialogComponent
   ],
   entryComponents: [
+    ConfirmationDialogComponent
   ],
   providers: [],
   bootstrap: [AppComponent]
