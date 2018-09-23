@@ -1,5 +1,5 @@
 <h3 class="title">{{ quizMetaData.name }}</h3>
 <section class="header-icons">
-  <button mat-icon-button><mat-icon [inline]="true" (click)="edit.emit()">edit</mat-icon></button>
-  <button mat-icon-button><mat-icon [inline]="true" (click)="save.emit()">check</mat-icon></button>
+  <button mat-icon-button (click)="edit.emit()"><mat-icon [inline]="true">edit</mat-icon></button>
+  <button mat-icon-button (click)="save.emit()"><mat-icon [inline]="true">check</mat-icon></button>
 </section>

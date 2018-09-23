@@ -87,6 +87,6 @@ export class CreateQuizView implements OnInit {
     }
 
     removeTag(tag: string) {
-        this.metadata.categories = this.metadata.categories.filter(cat => cat === tag);
+        this.metadata = { ...this.metadata, categories: this.metadata.categories.filter(cat => cat !== tag) };
     }
 }

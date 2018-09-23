@@ -12,9 +12,9 @@ const routes : Routes = [
     { path: '', resolve: [ InitResolver ], children: [
         { path: 'create', component: CreateQuizView },
         { path: 'browse', component: BrowseQuizzesView, resolve: [ QuizResolver ]},
-        { path: 'play/:quizId', component: PlayQuizView, resolve: [ PlayQuizResolver ]}
+        { path: 'play/:quizId', component: PlayQuizView, resolve: [ PlayQuizResolver ]},
+        { path: '', pathMatch: 'full', redirectTo: 'browse' },
     ]},
-    { path: '', pathMatch: 'full', redirectTo: 'browse' },
     { path: '**', component: PageNotFoundView }
 ]
 
