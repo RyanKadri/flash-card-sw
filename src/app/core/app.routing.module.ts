@@ -13,10 +13,10 @@ const routes : Routes = [
         { path: 'create', component: CreateQuizView },
         { path: 'browse', component: BrowseQuizzesView, resolve: [ QuizResolver ]},
         { path: 'play/:quizId', component: PlayQuizView, resolve: [ SingleQuizResolver ]},
-        { path: 'edit/:quizId', component: CreateQuizView, resolve: [ SingleQuizResolver ]}
+        { path: 'edit/:quizId', component: CreateQuizView, resolve: [ SingleQuizResolver ]},
+        { path: '', pathMatch: 'full', redirectTo: '/browse' },
+        { path: '**', component: PageNotFoundView }
     ]},
-    { path: '', pathMatch: 'full', redirectTo: 'browse' },
-    { path: '**', component: PageNotFoundView }
 ]
 
 @NgModule({
