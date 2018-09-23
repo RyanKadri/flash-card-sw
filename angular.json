@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "simple-notecards": {
+    "kepler": {
       "root": "",
       "sourceRoot": "src",
       "projectType": "application",
@@ -142,5 +142,5 @@
       }
     }
   },
-  "defaultProject": "simple-notecards"
+  "defaultProject": "kepler"
 }

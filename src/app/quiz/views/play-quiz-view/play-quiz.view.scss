@@ -4,6 +4,7 @@
     padding: 0;
     display: grid;
     background-color: #f0f0f0;
+    height: calc(100vh - var(--top-nav-height)); //TODO - Clean up
 }
 
 .progress-bar {

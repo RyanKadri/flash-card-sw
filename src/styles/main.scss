@@ -19,3 +19,9 @@ small {
 @media (max-width: 500px) {
     padding: 10px;
 }
+
+button[mat-icon-button].icon-button-small {
+    height: 30px;
+    width: 30px;
+    line-height: 30px;
+}
