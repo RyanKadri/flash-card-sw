@@ -8,9 +8,8 @@
     width: 100%;
     display: flex;
     justify-content: center;
-    align-items: flex-end;
     transform-style: preserve-3d;
-    position: relative;
+    padding: 8px;
 }
 
 .definition {
@@ -18,16 +17,22 @@
 }
 
 .term, .definition {
-    position: absolute;
     backface-visibility: hidden;
     transform-style: preserve-3d;
-    top: 32px;
-}
-
-header, footer {
     display: flex;
+    flex-wrap: wrap;
     justify-content: center;
-}    
+    align-items: flex-start;
+    mat-form-field {
+        flex-basis: 100%;
+    }
+
+    .image-container {
+        button {
+            background-color: rgba(255,255,255, 0.87);
+        }
+    }
+}
 
 .card-action {
     position: absolute;
@@ -41,4 +46,8 @@ header, footer {
         transform: rotateY(180deg);
         backface-visibility: hidden;
     }
+}
+
+.image-selector {
+    display: none;
 }

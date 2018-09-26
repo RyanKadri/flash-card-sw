@@ -21,6 +21,7 @@ import { PageNotFoundView } from './core/views/page-not-found/page-not-found.com
 import { QuizGameCardComponent } from './quiz/components/quiz-game-area/quiz-game-area.component';
 import { ConfirmationDialogComponent } from './shared/confirmation-dialog/confirmation-dialog.component';
 import { EditQuizDetailsComponent } from './quiz/components/edit-quiz-details/edit-quiz-details.component';
+import { SafeURLPipe } from './core/pipes/safe-url.pipe';
 
 @NgModule({
   imports: [
@@ -45,12 +46,14 @@ import { EditQuizDetailsComponent } from './quiz/components/edit-quiz-details/ed
     PageNotFoundView,
     QuizGameCardComponent,
     ConfirmationDialogComponent,
-    EditQuizDetailsComponent
+    EditQuizDetailsComponent,
+    SafeURLPipe
   ],
   entryComponents: [
     ConfirmationDialogComponent
   ],
-  providers: [],
+  providers: [
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

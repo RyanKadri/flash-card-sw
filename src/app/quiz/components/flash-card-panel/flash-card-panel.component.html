@@ -1,4 +1,4 @@
-<section class="card-container mat-elevation-z3" [@side]="_animationSide">
+<section class="card-container mat-elevation-z3" [@side]="_animationSide" (click)="flip($event)">
     <button *ngIf="editable && !editing" mat-icon-button [matMenuTriggerFor]="options" 
             class="card-action" [ngClass]="{'flipped': !termSide }">
         <mat-icon>more_vert</mat-icon>
@@ -8,9 +8,9 @@
     </button>
     <mat-menu #options="matMenu">
         <button mat-menu-item (click)="edit()">Edit</button>
-        <button mat-menu-item (click)="delete.emit()">Delete</button>
+        <button mat-menu-item (click)="delete.emit()">Delete</button> 
     </mat-menu>
-    <div class="term">
+    <div class="term" *ngIf="termSide">
         <ng-container *ngIf="!editing">
             {{ _card.term }}
         </ng-container>
@@ -19,8 +19,13 @@
                    placeholder="Term"
                    [(ngModel)]="_card.term">
         </mat-form-field>
+        <div class="image-container" [style.background-image]="termImage">
+            <button *ngIf="editing" mat-icon-button (click)="fileUpload.click()">
+                <mat-icon>image</mat-icon>
+            </button>
+        </div>
     </div>
-    <div class="definition">
+    <div class="definition" *ngIf="!termSide">
         <ng-container *ngIf="!editing">
             {{ _card.definition }}
         </ng-container>
@@ -29,11 +34,14 @@
                 placeholder="Definition"
                 [(ngModel)]="_card.definition">
         </mat-form-field>
-    </div>
-    
-    <footer class="actions">
-        <button mat-icon-button (click)="flip()">
-            <mat-icon>refresh</mat-icon>
+        <button *ngIf="editing" mat-icon-button (click)="fileUpload.click()">
+            <mat-icon>image</mat-icon>
         </button>
-    </footer>
+        <div class="image-container" [style.background-image]="definitionImage">
+            <button *ngIf="editing" mat-icon-button (click)="fileUpload.click()">
+                <mat-icon>image</mat-icon>
+            </button>
+        </div>
+    </div>
+    <input class="image-selector" type="file" #fileUpload (change)="attachImage($event)">
 </section>
