@@ -9,8 +9,8 @@
     <div class="card-container" *ngFor="let card of quiz.cards; trackBy: trackByCard; let cardInd = index">
         <flash-card-panel [card]="card" [editable]="true" [openWithEdit]="card.temp"
                 (save)="updateCard($event, cardInd)" (delete)="deleteCard(cardInd)"></flash-card-panel>
-        <button mat-mini-fab class="insert-button after" (click)="insertCard(cardInd - 1)"><mat-icon>add</mat-icon></button>
         <button mat-mini-fab class="insert-button before" (click)="insertCard(cardInd)"><mat-icon>add</mat-icon></button>
+        <button mat-mini-fab class="insert-button after" (click)="insertCard(cardInd + 1)"><mat-icon>add</mat-icon></button>
     </div>
     <button mat-fab *ngIf="!supportsHover && quiz.cards.length > 0" (click)="insertCard(quiz.cards.length)">
         <mat-icon>add</mat-icon>

@@ -27,7 +27,7 @@ export class CreateQuizView implements OnInit {
         name: "",
         description: "",
         tags: [],
-        cards: []
+        cards: [{ term: { value: "" }, definition: { value: "" }, temp: true} as FlashCardInfo]
     }
 
     largeScreen: boolean = false;
