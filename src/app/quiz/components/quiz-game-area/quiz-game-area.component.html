@@ -1,9 +1,9 @@
-<div class="card-container">
+<div class="card-container" (swipeleft)="next()" (swiperight)="previous()">
   <flash-card-panel [card]="card"></flash-card-panel>
   <button mat-icon-button class="card-control left" (click)="previous()" [disabled]="currentCard === 0">
     <mat-icon>chevron_left</mat-icon>
   </button>
-  <button mat-icon-button class="card-control right" (click)="next()" [disabled]="currentCard === cards.length">
+  <button mat-icon-button class="card-control right" (click)="next()" [disabled]="currentCard === cards.length - 1">
       <mat-icon>chevron_right</mat-icon>
     </button>
 </div>

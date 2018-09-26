@@ -13,10 +13,14 @@
     flex-wrap: wrap;
     background-color: #fff;
 
+    hr {
+        flex-basis: 100%;
+        border: none;
+        margin: 0;
+    }
+
     mat-form-field, header {
         margin: 16px;
-        flex-basis: 100%;
-        text-align: center;
     }
     
     mat-menu {

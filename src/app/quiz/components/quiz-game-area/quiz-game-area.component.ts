@@ -28,13 +28,17 @@ export class QuizGameCardComponent implements OnInit {
   get card() {
     return this.cards[this.currentCard]
   }
-  
+
   next() {
-    this.currentCardChange.emit(this.currentCard + 1);
+    if(this.currentCard < this.cards.length - 1) {
+      this.currentCardChange.emit(this.currentCard + 1);
+    }
   }
 
   previous() {
-    this.currentCardChange.emit(this.currentCard - 1);
+    if(this.currentCard > 0) {
+      this.currentCardChange.emit(this.currentCard - 1);
+    }
   }
 
 }
