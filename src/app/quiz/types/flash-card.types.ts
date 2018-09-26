@@ -1,6 +1,6 @@
 export interface FlashCardInfo {
-    question: string;
-    answer: string;
+    term: string;
+    definition: string;
     id?: number;
 }
 

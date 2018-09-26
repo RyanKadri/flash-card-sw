@@ -6,14 +6,4 @@
   <span class="definition" *ngIf="!termSide">
     {{ card.answer }}
   </span>
-  <div class="card-controls">
-    <button mat-icon-button [disabled]="currentCard === 0"
-      (click)="previous(); $event.stopPropagation()">
-      <mat-icon>chevron_left</mat-icon>
-    </button>
-    <button mat-icon-button [disabled]="currentCard === cards.length - 1"
-      (click)="next(); $event.stopPropagation()">
-      <mat-icon>chevron_right</mat-icon>
-    </button>
-  </div>
 </div>

@@ -1,0 +1,19 @@
+<form (submit)="_save()" autocomplete="off">
+  <mat-form-field>
+    <input name="name" matInput placeholder="Title" [(ngModel)]="_details.name">
+  </mat-form-field>
+  <mat-form-field>
+    <textarea name="description" matInput matTextareaAutosize placeholder="Description" [(ngModel)]="_details.description"></textarea>
+  </mat-form-field>
+  <mat-form-field>
+    <mat-chip-list #chipList>
+        <mat-chip *ngFor="let tag of _details.tags" selectable="false" removable="true" (removed)="removeTag(tag)">
+            {{ tag }}
+            <mat-icon matChipRemove>cancel</mat-icon>
+        </mat-chip>
+        <input name="tags" placeholder="Enter a tag..." [matChipInputFor]="chipList" [matChipInputSeparatorKeyCodes]="separatorKeyCodes"
+            matChipInputAddOnBlur="false" (matChipInputTokenEnd)="addTag($event)" [(ngModel)]="leftover">
+    </mat-chip-list>
+  </mat-form-field>
+  <button class="save-details" mat-raised-button color="accent" type="submit">Save</button>
+</form>

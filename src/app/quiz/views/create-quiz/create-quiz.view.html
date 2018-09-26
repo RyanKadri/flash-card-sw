@@ -1,32 +1,14 @@
 <quiz-metadata *ngIf="!editMetadata || !largeScreen" class="color-primary-light" 
-    [quizMetaData]="quiz" (save)="save()" (edit)="edit()"></quiz-metadata>
-<form class="metadata-area mat-elevation-z3" (submit)="editMetadata = false" [ngClass]="{ collapse: !editMetadata }">
-    <mat-form-field>
-        <input name="name" matInput placeholder="Title" [(ngModel)]="quiz.name">
-    </mat-form-field>
-    <mat-form-field>
-        <textarea name="description" matInput matTextareaAutosize placeholder="Description" [(ngModel)]="quiz.description"></textarea>
-    </mat-form-field>
-    <mat-form-field>
-        <mat-chip-list #chipList>
-            <mat-chip *ngFor="let tag of quiz.tags" selectable="false" removable="true" (removed)="removeTag(tag)">
-                {{ tag }}
-                <mat-icon matChipRemove>cancel</mat-icon>
-            </mat-chip>
-            <input placeholder="Enter a tag..." [matChipInputFor]="chipList" [matChipInputSeparatorKeyCodes]="separatorKeyCodes"
-                matChipInputAddOnBlur="false" (matChipInputTokenEnd)="addTag($event)">
-        </mat-chip-list>
-    </mat-form-field>
-    <button class="save-button" (click)="editMetadata = false" class="save-button" mat-raised-button color="accent">Save</button>
-</form>
+    [quizMetaData]="quiz" (edit)="edit()"></quiz-metadata>
+<edit-quiz-details [details]="quiz" (save)="updateDetails($event)"
+    class="mat-elevation-z3" [ngClass]="{ collapse: !editMetadata }"></edit-quiz-details>
 <div class="quiz-body">
     <create-card-panel class="mat-elevation-z3" (create)="createCard($event)"></create-card-panel>
     <section class="card-section">
-        <ng-container *ngFor="let card of quiz.cards; trackBy: trackByCard">
-            <flash-card-panel class="mat-elevation-z3" [ngClass]="{ highlighted: isHighlighted(card) }"
-                [cardInfo]="card"
-                (press)="highlight(card)">
-            </flash-card-panel>
+        <ng-container *ngFor="let card of quiz.cards; trackBy: trackByCard; let cardInd = index">
+            <flash-card-panel [card]="card" [editable]="true"
+                 (save)="updateCard($event, cardInd)" (delete)="deleteCard(cardInd)"></flash-card-panel>
         </ng-container>
     </section> 
 </div>
+<button *ngIf="!editMetadata && !editMode" class="save-quiz" mat-raised-button color="accent" (click)="save()">Create</button>

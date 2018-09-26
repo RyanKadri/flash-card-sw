@@ -30,11 +30,7 @@ export class CreateQuizView implements OnInit {
         cards: []
     }
 
-    selectedCards = new Set<FlashCardInfo>();
-
     largeScreen: boolean = false;
-
-    readonly separatorKeyCodes = [ ENTER, COMMA ]
 
     ngOnInit() {
         const media = matchMedia('(min-width: 700px)');
@@ -60,40 +56,38 @@ export class CreateQuizView implements OnInit {
         this.router.navigate(['/browse'])
     }
 
-    isHighlighted(card: FlashCardInfo) {
-        return this.selectedCards.has(card);
-    }
-
     createCard(created: FlashCardInfo) {
         this.quiz.cards.unshift({ ...created, id: this.quiz.cards.length });
-    }
-
-    highlight(card: FlashCardInfo) {
-        if(this.selectedCards.has(card)) {
-            this.selectedCards.delete(card);
-        } else {
-            this.selectedCards.add(card);
-        }
-
-        navigator.vibrate(80);
+        this.quickSave();
     }
 
     trackByCard(card: FlashCardInfo) {
         return card.id;
     }
 
-    addTag(e: MatChipInputEvent) {
-        const input = e.input;
-        const val = e.value;
-        if(val) {
-            this.quiz.tags = this.quiz.tags.concat(val);
-        }
-        if(input) {
-            input.value = '';
-        }
+    updateDetails(details: QuizInfo) {
+        this.editMetadata = false;
+        this.quiz = { ...this.quiz, ...details };
+        this.quickSave()
+        
     }
 
-    removeTag(tag: string) {
-        this.quiz = { ...this.quiz, tags: this.quiz.tags.filter(cat => cat !== tag) };
+    updateCard(updated: FlashCardInfo, ind: number) {
+        const newCards = [...this.quiz.cards];
+        newCards[ind] = updated;
+        this.quiz = { ...this.quiz, cards: newCards };
+        this.quickSave();
+    }
+
+    deleteCard(ind: number) {
+        const newCards = this.quiz.cards.filter((card, i) => i !== ind);
+        this.quiz = { ...this.quiz, cards: newCards };
+        this.quickSave();
+    }
+
+    private quickSave() {
+        if(this.editMode) {
+            this.quizService.saveQuiz(this.quiz);
+        }
     }
 }

@@ -20,6 +20,7 @@ import { PlayQuizView } from './quiz/views/play-quiz-view/play-quiz.view';
 import { PageNotFoundView } from './core/views/page-not-found/page-not-found.component';
 import { QuizGameCardComponent } from './quiz/components/quiz-game-area/quiz-game-area.component';
 import { ConfirmationDialogComponent } from './shared/confirmation-dialog/confirmation-dialog.component';
+import { EditQuizDetailsComponent } from './quiz/components/edit-quiz-details/edit-quiz-details.component';
 
 @NgModule({
   imports: [
@@ -43,7 +44,8 @@ import { ConfirmationDialogComponent } from './shared/confirmation-dialog/confir
     PlayQuizView,
     PageNotFoundView,
     QuizGameCardComponent,
-    ConfirmationDialogComponent
+    ConfirmationDialogComponent,
+    EditQuizDetailsComponent
   ],
   entryComponents: [
     ConfirmationDialogComponent

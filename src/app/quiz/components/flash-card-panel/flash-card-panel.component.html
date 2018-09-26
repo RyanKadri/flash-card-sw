@@ -1,3 +1,39 @@
-<header>{{ cardInfo.question }}</header>
-<hr />
-<footer>{{ cardInfo.answer }}</footer>
+<section class="card-container mat-elevation-z3" [@side]="_animationSide">
+    <button *ngIf="editable && !editing" mat-icon-button [matMenuTriggerFor]="options" 
+            class="card-action" [ngClass]="{'flipped': !termSide }">
+        <mat-icon>more_vert</mat-icon>
+    </button>
+    <button *ngIf="editable && editing" mat-icon-button class="card-action" [ngClass]="{'flipped': !termSide }" (click)="_save()">
+        <mat-icon>check</mat-icon>
+    </button>
+    <mat-menu #options="matMenu">
+        <button mat-menu-item (click)="edit()">Edit</button>
+        <button mat-menu-item (click)="delete.emit()">Delete</button>
+    </mat-menu>
+    <div class="term">
+        <ng-container *ngIf="!editing">
+            {{ _card.term }}
+        </ng-container>
+        <mat-form-field *ngIf="editing">
+            <input autofocus name="term" matInput 
+                   placeholder="Term"
+                   [(ngModel)]="_card.term">
+        </mat-form-field>
+    </div>
+    <div class="definition">
+        <ng-container *ngIf="!editing">
+            {{ _card.definition }}
+        </ng-container>
+        <mat-form-field *ngIf="editing">
+            <input autofocus name="term" matInput 
+                placeholder="Definition"
+                [(ngModel)]="_card.definition">
+        </mat-form-field>
+    </div>
+    
+    <footer class="actions">
+        <button mat-icon-button (click)="flip()">
+            <mat-icon>refresh</mat-icon>
+        </button>
+    </footer>
+</section>

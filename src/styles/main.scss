@@ -25,3 +25,19 @@ button[mat-icon-button].icon-button-small {
     width: 30px;
     line-height: 30px;
 }
+
+button[mat-icon-button].icon-button-xs {
+    height: 20px;
+    width: 20px;
+    line-height: 20px;
+
+    mat-icon {
+        line-height: 20px;
+    }
+}
+
+/* This works around a rotation issue with material inputs... Is there a better way? */
+.mat-form-field-appearance-legacy.mat-form-field-can-float.mat-form-field-should-float .mat-form-field-label, .mat-form-field-appearance-legacy.mat-form-field-can-float .mat-input-server:focus + .mat-form-field-label-wrapper .mat-form-field-label {
+    background: white;
+    backface-visibility: hidden;
+}

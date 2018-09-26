@@ -8,18 +8,6 @@ import { trigger, state, style, transition, animate } from '@angular/animations'
   styleUrls: ['./quiz-game-area.component.scss'],
   encapsulation: ViewEncapsulation.Emulated,
   changeDetection: ChangeDetectionStrategy.Default,
-  animations: [
-    trigger('side', [
-      state('term', style({
-        transform: 'rotateY(0)'
-      })),
-      state('definition', style({
-        transform: 'rotateY(179.9deg)'
-      })),
-      transition('term => definition', animate('300ms ease-out')),
-      transition('definition => term', animate('300ms ease-in'))
-    ])
-  ]
 })
 export class QuizGameCardComponent implements OnInit {
 

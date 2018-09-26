@@ -1,0 +1,44 @@
+:host {
+    display: flex;
+    background-color: #fff;
+    position: relative;
+}
+
+.card-container {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    transform-style: preserve-3d;
+    position: relative;
+}
+
+.definition {
+    transform: rotateY(180deg);
+}
+
+.term, .definition {
+    position: absolute;
+    backface-visibility: hidden;
+    transform-style: preserve-3d;
+    top: 32px;
+}
+
+header, footer {
+    display: flex;
+    justify-content: center;
+}    
+
+.card-action {
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    z-index: 3;
+
+    &.flipped {
+        right: unset;
+        left: 0px;
+        transform: rotateY(180deg);
+        backface-visibility: hidden;
+    }
+}

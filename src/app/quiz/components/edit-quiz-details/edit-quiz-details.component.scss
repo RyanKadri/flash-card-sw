@@ -1,0 +1,19 @@
+:host {
+    background-color: #fff;
+}
+
+form {
+    padding: 16px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+}
+
+mat-form-field {
+    width: 100%;
+}
+
+.save-details {
+    align-self: flex-end;
+    margin-top: 24px;
+}

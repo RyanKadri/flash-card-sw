@@ -10,20 +10,10 @@ quiz-metadata {
     grid-area: metadata-summary;
 }
 
-.metadata-area {
+edit-quiz-details {
     grid-area: metadata-entry;
-
-    box-sizing: border-box;
-    display: flex;
-    flex-direction: column;
-    padding: 16px;
     height: calc(100vh - var(--top-nav-height));
     width: 300px;
-    background-color: #fff;
-    
-    mat-form-field {
-        width: 100%;
-    }
 }
 
 .quiz-body {
@@ -45,36 +35,37 @@ quiz-metadata {
     align-items: start;
 }
 
-flash-card-panel.highlighted {
-    background-color: #dddddd;
+flash-card-panel {
+    min-height: 150px;
 }
 
-
-.save-button {
-    align-self: flex-end;
-    margin-top: 24px;
+.save-quiz {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    z-index: 52;
 }
 
 @media (max-width: 500px) {
     .card-section {
         grid-template-columns: 1fr;
     }
-    .metadata-area {
-        box-sizing: border-box;
+    edit-quiz-details {
         height: 100vh;
-        position: fixed;
+        position: absolute;
+        overflow-y: auto;
         width: 100vw;
         z-index: 99;
         transition: transform 300ms ease-in, opacity 300ms ease-in;
         transform-origin: top;
     }
-    .metadata-area.collapse {
+    edit-quiz-details.collapse {
         transform: scaleY(0);
         opacity: 0;
     }
 }
 @media (min-width: 501px) {
-    .metadata-area.collapse {
+    edit-quiz-details.collapse {
         display: none;
     }
 }
