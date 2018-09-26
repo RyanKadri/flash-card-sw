@@ -1,6 +1,6 @@
-import { Component, Input, HostListener, Output, EventEmitter, OnChanges } from "@angular/core";
-import { FlashCardInfo } from "../../types/flash-card.types";
-import { trigger, state, style, transition, animate } from "@angular/animations";
+import { Component, Input, HostListener, Output, EventEmitter, OnChanges, OnInit } from "@angular/core";
+import { FlashCardInfo, FlashCardSide } from "../../types/flash-card.types";
+import { trigger, state, style, transition, animate, sequence } from "@angular/animations";
 import { DomSanitizer, SafeStyle } from "@angular/platform-browser";
 
 @Component({
@@ -13,18 +13,20 @@ import { DomSanitizer, SafeStyle } from "@angular/platform-browser";
             transform: 'rotateY(0)'
           })),
           state('definition', style({
-            transform: 'rotateY(179.9deg)'
+            transform: 'rotateY(0)'
           })),
-          transition('term => definition', animate('300ms ease-out')),
-          transition('definition => term', animate('300ms ease-in'))
+          state('side', style({})),
+          transition('term => side', sequence([
+            animate('150ms ease-in', style({ transform: 'rotateY(90deg)'})),
+          ])),
+          transition('definition => side', sequence([
+              animate('150ms ease-in', style({ transform: 'rotateY(-90deg)'})),
+          ])),
+          transition('side => *', animate('150ms ease-out', style({ transform: 'rotateY(0deg)' })))
         ])
       ]
 })
-export class FlashCardPanel implements OnChanges {
-
-    constructor(
-        private domSanitizer: DomSanitizer
-    ) {}
+export class FlashCardPanel implements OnInit, OnChanges {
 
     @Input()
     card: FlashCardInfo
@@ -32,6 +34,9 @@ export class FlashCardPanel implements OnChanges {
 
     @Input()
     editable = false;
+
+    @Input()
+    openWithEdit = false;
 
     @Output()
     save = new EventEmitter<FlashCardInfo>();
@@ -41,15 +46,28 @@ export class FlashCardPanel implements OnChanges {
     
     editing = false;
     termSide = true;
-    termImage: SafeStyle;
-    definitionImage: SafeStyle;
-
+    animating = false;
+   
     get _animationSide() {
-        return this.termSide ? "term" : "definition";
+        if(this.animating) {
+            return 'side';
+        } else {
+            return this.termSide ? "term" : "definition";
+        }
+    }
+
+    get currentSide() {
+        return this.termSide ? this._card.term : this._card.definition;
+    }
+
+    ngOnInit() {
     }
     
     ngOnChanges() {
         this._card = { ...this.card };
+        if(this.openWithEdit) {
+            this.editing = true;
+        }
     }
 
     edit() {
@@ -62,8 +80,23 @@ export class FlashCardPanel implements OnChanges {
     }
 
     //TODO - Is this a bad idea?
-    flip(e: MouseEvent) {
-        if(e.target === e.currentTarget) {
+    flip(e?: MouseEvent) {
+        if(!e || e.target === e.currentTarget) {
+            this.animating = true;
+        }
+    }
+
+    pressEnter() {
+        if((this.termSide && !this.card.definition.value) || (!this.termSide && !this.card.term.value)) {
+            this.flip();
+        } else {
+            this._save();
+        }
+    }
+
+    continueFlip() {
+        if(this.animating) {
+            this.animating = false;
             this.termSide = !this.termSide;
         }
     }
@@ -78,16 +111,14 @@ export class FlashCardPanel implements OnChanges {
     }
 
     private updateImage(blob: Blob) {
-        let oldImage: SafeStyle;
-        if(this.termSide) {
-            oldImage = this.termImage;
-            this.termImage = this.domSanitizer.bypassSecurityTrustStyle(`url(${URL.createObjectURL(blob)})`)
-        } else {
-            oldImage = this.definitionImage;
-            this.definitionImage = URL.createObjectURL(blob);
-        }
+        const oldImage = this.currentSide.image;
+        this.currentSide.image = URL.createObjectURL(blob);
         if(oldImage) {
-            URL.revokeObjectURL(oldImage + "");
+            URL.revokeObjectURL(oldImage);
         }
+    }
+
+    removeImage() {
+        this.currentSide.image = undefined;
     }
 }

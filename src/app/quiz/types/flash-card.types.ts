@@ -1,7 +1,12 @@
 export interface FlashCardInfo {
-    term: string;
-    definition: string;
+    term: FlashCardSide;
+    definition: FlashCardSide; 
     id?: number;
+}
+
+export interface FlashCardSide {
+    value: string;
+    image?: string;
 }
 
 export interface QuizMetadata {

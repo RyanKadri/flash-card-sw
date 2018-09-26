@@ -28,15 +28,7 @@ export class QuizGameCardComponent implements OnInit {
   get card() {
     return this.cards[this.currentCard]
   }
-
-  termSide = true;
-  _animationSide = "term";
-
-  turnCard() {
-    this._animationSide = this.termSide ? 'definition' : 'term';
-    this.termSide = !this.termSide;
-  }
-
+  
   next() {
     this.currentCardChange.emit(this.currentCard + 1);
   }

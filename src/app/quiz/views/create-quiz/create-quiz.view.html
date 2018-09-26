@@ -2,13 +2,18 @@
     [quizMetaData]="quiz" (edit)="edit()"></quiz-metadata>
 <edit-quiz-details [details]="quiz" (save)="updateDetails($event)"
     class="mat-elevation-z3" [ngClass]="{ collapse: !editMetadata }"></edit-quiz-details>
-<div class="quiz-body">
-    <create-card-panel class="mat-elevation-z3" (create)="createCard($event)"></create-card-panel>
-    <section class="card-section">
-        <ng-container *ngFor="let card of quiz.cards; trackBy: trackByCard; let cardInd = index">
-            <flash-card-panel [card]="card" [editable]="true"
-                 (save)="updateCard($event, cardInd)" (delete)="deleteCard(cardInd)"></flash-card-panel>
-        </ng-container>
-    </section> 
-</div>
+<section class="card-section">
+    <button mat-fab *ngIf="!supportsHover" (click)="insertCard(0)">
+        <mat-icon>add</mat-icon>
+    </button>
+    <div class="card-container" *ngFor="let card of quiz.cards; trackBy: trackByCard; let cardInd = index">
+        <flash-card-panel [card]="card" [editable]="true" [openWithEdit]="card.temp"
+                (save)="updateCard($event, cardInd)" (delete)="deleteCard(cardInd)"></flash-card-panel>
+        <button mat-mini-fab class="insert-button after" (click)="insertCard(cardInd - 1)"><mat-icon>add</mat-icon></button>
+        <button mat-mini-fab class="insert-button before" (click)="insertCard(cardInd)"><mat-icon>add</mat-icon></button>
+    </div>
+    <button mat-fab *ngIf="!supportsHover && quiz.cards.length > 0" (click)="insertCard(quiz.cards.length)">
+        <mat-icon>add</mat-icon>
+    </button>
+</section> 
 <button *ngIf="!editMetadata && !editMode" class="save-quiz" mat-raised-button color="accent" (click)="save()">Create</button>

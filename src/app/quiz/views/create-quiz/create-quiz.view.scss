@@ -16,26 +16,19 @@ edit-quiz-details {
     width: 300px;
 }
 
-.quiz-body {
-    grid-area: quiz-area;
-    padding: 24px 8px;
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    flex-grow: 1;
-}
-
-
 .card-section {
-    padding: 30px 0px;
+    grid-area: quiz-area;
+    padding: 16px 32px;
+    box-sizing: border-box;
     flex-basis: 100%;
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
     grid-gap: 10px;
-    align-items: start;
+    align-items: center;
+    justify-items: center;
 }
 
-flash-card-panel {
+flash-card-panel, .create {
     min-height: 150px;
 }
 
@@ -46,9 +39,36 @@ flash-card-panel {
     z-index: 52;
 }
 
+.card-container {
+    position: relative;
+    width: 100%;
+}
+
+.insert-button {
+    display: none;
+    position: absolute;
+    top: 50%;
+    z-index:4;
+    &.before {
+        left: 0px;
+        transform: translate(-25px, -50%);
+    }
+    &.after {
+        right: 0px;
+        transform: translate(25px, -50%);
+    }
+
+    @media (pointer: fine) {
+        .card-container:hover & {
+            display: block;
+        }
+    }
+}
+
 @media (max-width: 500px) {
     .card-section {
         grid-template-columns: 1fr;
+        padding: 8px 8px;
     }
     edit-quiz-details {
         height: 100vh;

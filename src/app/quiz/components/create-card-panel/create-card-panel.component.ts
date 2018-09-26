@@ -27,7 +27,7 @@ export class CreateCardPanel implements OnInit {
         } else {
             this.answer = this.formVal;
             if(this.question) {
-                this.create.emit({ term: this.question, definition: this.answer });
+                this.create.emit({ term: {value: this.question}, definition: { value: this.answer} });
             }
             this.clearCard();
         }

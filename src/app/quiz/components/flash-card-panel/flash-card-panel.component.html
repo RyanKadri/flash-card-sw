@@ -1,47 +1,42 @@
-<section class="card-container mat-elevation-z3" [@side]="_animationSide" (click)="flip($event)">
-    <button *ngIf="editable && !editing" mat-icon-button [matMenuTriggerFor]="options" 
-            class="card-action" [ngClass]="{'flipped': !termSide }">
-        <mat-icon>more_vert</mat-icon>
-    </button>
-    <button *ngIf="editable && editing" mat-icon-button class="card-action" [ngClass]="{'flipped': !termSide }" (click)="_save()">
-        <mat-icon>check</mat-icon>
-    </button>
-    <mat-menu #options="matMenu">
-        <button mat-menu-item (click)="edit()">Edit</button>
-        <button mat-menu-item (click)="delete.emit()">Delete</button> 
-    </mat-menu>
-    <div class="term" *ngIf="termSide">
-        <ng-container *ngIf="!editing">
-            {{ _card.term }}
-        </ng-container>
-        <mat-form-field *ngIf="editing">
-            <input autofocus name="term" matInput 
-                   placeholder="Term"
-                   [(ngModel)]="_card.term">
-        </mat-form-field>
-        <div class="image-container" [style.background-image]="termImage">
-            <button *ngIf="editing" mat-icon-button (click)="fileUpload.click()">
-                <mat-icon>image</mat-icon>
-            </button>
-        </div>
-    </div>
-    <div class="definition" *ngIf="!termSide">
-        <ng-container *ngIf="!editing">
-            {{ _card.definition }}
-        </ng-container>
-        <mat-form-field *ngIf="editing">
-            <input autofocus name="term" matInput 
-                placeholder="Definition"
-                [(ngModel)]="_card.definition">
-        </mat-form-field>
-        <button *ngIf="editing" mat-icon-button (click)="fileUpload.click()">
+<section class="card-container mat-elevation-z3" (click)="flip($event)"
+        [@side]="_animationSide" (@side.done)="continueFlip()">
+    <!-- Control Buttons -->
+    <ng-container *ngIf="editable">
+        <button *ngIf="!editing" mat-icon-button [matMenuTriggerFor]="options" 
+                class="card-action">
+            <mat-icon>more_vert</mat-icon>
+        </button>
+        <button *ngIf="editing" mat-icon-button class="card-action" (click)="_save()">
+            <mat-icon>check</mat-icon>
+        </button>
+        <mat-menu #options="matMenu">
+            <button mat-menu-item (click)="edit()">Edit</button>
+            <button mat-menu-item (click)="delete.emit()">Delete</button> 
+        </mat-menu>
+    </ng-container>
+
+    <!-- Card Details -->
+    <header *ngIf="!editing">
+        {{ currentSide.value }}
+    </header>
+    <mat-form-field *ngIf="editing">
+        <input autofocus name="term" matInput 
+                [placeholder]="termSide ? 'Term' : 'Definition'"
+                [(ngModel)]="currentSide.value"
+                (keydown.enter)="pressEnter()">
+    </mat-form-field>
+    <div class="image-container" *ngIf="editing || currentSide.image">
+        <img *ngIf="currentSide.image" [src]="currentSide.image | safeUrl" height="100%" />
+        <button class="source" *ngIf="editing && !currentSide.image" mat-icon-button (click)="fileUpload.click()">
             <mat-icon>image</mat-icon>
         </button>
-        <div class="image-container" [style.background-image]="definitionImage">
-            <button *ngIf="editing" mat-icon-button (click)="fileUpload.click()">
-                <mat-icon>image</mat-icon>
-            </button>
-        </div>
+        <button class="options" *ngIf="editing && currentSide.image" mat-icon-button [matMenuTriggerFor]="imageOptions">
+            <mat-icon>more_vert</mat-icon>
+        </button>
+        <mat-menu #imageOptions="matMenu">
+            <button mat-menu-item (click)="fileUpload.click()">Choose New Image</button>
+            <button mat-menu-item (click)="removeImage()">Remove</button>
+        </mat-menu>
     </div>
     <input class="image-selector" type="file" #fileUpload (change)="attachImage($event)">
 </section>
