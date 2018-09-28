@@ -10,14 +10,23 @@ export interface FetchCriteria<T> {
     [field: string]: any
 }
 
-export interface PersistenceSchema<T extends HasId> {
-    localState: State<T>
+//Do I want to generalize this to more types of persistence providers? Maybe make each one its own sub-object?
+export interface PersistenceSchema<StateType extends HasId, IDBPersistenceType = StateType, RemotePersistenceType = StateType> {
+    localState: State<StateType>
 
     idbDatabase: string;
     idbObjectStore: string;
 
+    //These methods are both needed if StateType !== IDBPersistenceType
+    idbBeforePersist?: (toPersist: StateType) => IDBPersistenceType;
+    idbAfterFetch?: (fetched: IDBPersistenceType) => StateType;
+
     remoteResourceBulk: string;
-    remoteResource: (item: T) => string;
+    remoteResource: (item: StateType) => string;
+
+    // This may need to change based on how fancy we get with responses
+    remoteResourceBeforePersist?: (toPersist: StateType) => RemotePersistenceType;
+    remoteResourceAfterFetch?: (fetched: RemotePersistenceType) => StateType;
 }
 
 export interface SchemaUpgrade {

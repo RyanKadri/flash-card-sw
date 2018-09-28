@@ -2,6 +2,7 @@ import { Component, Input, HostListener, Output, EventEmitter, OnChanges, OnInit
 import { FlashCardInfo, FlashCardSide } from "../../types/flash-card.types";
 import { trigger, state, style, transition, animate, sequence } from "@angular/animations";
 import { DomSanitizer, SafeStyle } from "@angular/platform-browser";
+import { ImageService } from "../../services/image-service";
 
 @Component({
     selector: 'flash-card-panel',
@@ -27,6 +28,10 @@ import { DomSanitizer, SafeStyle } from "@angular/platform-browser";
       ]
 })
 export class FlashCardPanel implements OnInit, OnChanges {
+
+    constructor(
+        private imageService: ImageService
+    ) { }
 
     @Input()
     card: FlashCardInfo
@@ -68,6 +73,12 @@ export class FlashCardPanel implements OnInit, OnChanges {
         if(this.openWithEdit) {
             this.editing = true;
         }
+        if(this._card.definition.image) {
+            this.imageService.fetchImage(this._card.definition.image.id).then(image => this._card.definition.image = image);
+        }
+        if(this._card.term.image) {
+            this.imageService.fetchImage(this._card.term.image.id).then(image => this._card.term.image = image);
+        } 
     }
 
     edit() {
@@ -106,19 +117,11 @@ export class FlashCardPanel implements OnInit, OnChanges {
         const input = e.target as HTMLInputElement;
         if(input.files && input.files.length === 1) {
             const file = input.files[0];
-            this.updateImage(file);
-        }
-    }
-
-    private updateImage(blob: Blob) {
-        const oldImage = this.currentSide.image;
-        this.currentSide.image = URL.createObjectURL(blob);
-        if(oldImage) {
-            URL.revokeObjectURL(oldImage);
+            this.card.term = this.imageService.attachImage(this.currentSide, file);
         }
     }
 
     removeImage() {
-        this.currentSide.image = undefined;
+        this.imageService.removeImage(this.currentSide);
     }
 }

@@ -30,7 +30,7 @@ export class LocalPersistenceService implements PersistenceProvider {
         await this.evolutionService.ensureDatabaseUpdate();
     }
 
-    async persist<T extends HasId>(items: T[], schema: PersistenceSchema<T>) {
+    async persist<T extends HasId, IDB = T, Remote = T>(items: T[], schema: PersistenceSchema<T, IDB, Remote>) {
         const db = await idb.open(schema.idbDatabase, this.databaseVersion);
         const tx = db.transaction(schema.idbObjectStore, 'readwrite');
         const store = tx.objectStore(schema.idbObjectStore);

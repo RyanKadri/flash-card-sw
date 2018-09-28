@@ -33,7 +33,7 @@ export class PersistenceService {
         return await this.localPersistenceService.initialize();
     }
 
-    async persist<T>(toPersist: T[], schema: PersistenceSchema<T & HasId>, options?: Partial<PersistenceOptions>) {
+    async persist<T, IDB = T, Remote = T>(toPersist: T[], schema: PersistenceSchema<T & HasId, IDB, Remote>, options?: Partial<PersistenceOptions>) {
         const fullOptions = { ...this.defaultPersistenceOptions, ...options }
         const toPersistWithIds = toPersist.map(item => item['id'] ? item : ({ ...item as any, id: uuidv4() })) as (T & HasId)[];
         schema.localState.upsert(...toPersistWithIds);
@@ -56,7 +56,7 @@ export class PersistenceService {
         }
     }
 
-    async fetch<T extends HasId>(schema: PersistenceSchema<T>, criteria?: FetchCriteria<T>, options?: Partial<FetchOptions>) {
+    async fetch<T extends HasId>(schema: PersistenceSchema<T, any, any>, criteria?: FetchCriteria<T>, options?: Partial<FetchOptions>) {
         const fullOptions = { ...this.defaultFetchOptions, ...options };
         let firstProvider: PersistenceProvider;
         let fallback: PersistenceProvider;

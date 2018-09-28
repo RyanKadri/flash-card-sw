@@ -1,5 +1,5 @@
 import { Component, OnInit } from "@angular/core";
-import { FlashCardInfo, QuizMetadata, QuizInfo } from "../../types/flash-card.types";
+import { FlashCardInfo, QuizInfo } from "../../types/flash-card.types";
 import { Router, ActivatedRoute } from "@angular/router";
 import { QuizService } from "../../services/quiz.service";
 import { MatChipInputEvent } from "@angular/material";
@@ -65,12 +65,12 @@ export class CreateQuizView implements OnInit {
     }
 
     createCard(created: FlashCardInfo) {
-        this.quiz.cards.unshift({ ...created, id: this.quiz.cards.length });
+        this.quiz.cards.unshift({ ...created });
         this.quickSave();
     }
 
     trackByCard(card: FlashCardInfo) {
-        return card.id;
+        return card;
     }
 
     updateDetails(details: QuizInfo) {

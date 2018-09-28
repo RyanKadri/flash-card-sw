@@ -10,12 +10,12 @@ export class RemotePersistenceService implements PersistenceProvider {
         private http: HttpClient
     ) {}
 
-    async persist<T extends HasId>(toPersist: T[], schema: PersistenceSchema<T>): Promise<T[]> {
+    async persist<T extends HasId>(toPersist: T[], schema: PersistenceSchema<any>): Promise<T[]> {
         const url = schema.remoteResourceBulk;
         return this.http.put<T[]>(url, toPersist, { responseType: 'json' }).toPromise()
     }
 
-    async fetch<T extends HasId>(schema: PersistenceSchema<T>, criteria: FetchCriteria<T>): Promise<FetchResult<T[]>> {
+    async fetch<T extends HasId, >(schema: PersistenceSchema<any>, criteria: FetchCriteria<T>): Promise<FetchResult<T[]>> {
         const url = schema.remoteResourceBulk;
         const res = await this.http.get<T[]>(url).toPromise();
         return { result: res, status: FetchStatus.OK }

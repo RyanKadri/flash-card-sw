@@ -40,5 +40,5 @@ export interface IdMap<T> {
 }
 
 export interface HasId {
-    id: number | string;
+    id?: number | string;
 }

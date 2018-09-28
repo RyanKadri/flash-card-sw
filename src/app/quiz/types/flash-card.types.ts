@@ -1,18 +1,18 @@
 export interface FlashCardInfo {
     term: FlashCardSide;
     definition: FlashCardSide; 
-    id?: number;
 }
 
 export interface FlashCardSide {
     value: string;
-    image?: string;
+    image?: ImageInfo;
 }
 
-export interface QuizMetadata {
-    name: string;
-    description: string;
-    categories: string[] //TODO - For now
+export interface ImageInfo {
+    id?: string;
+    data?: Blob;
+    type: string;
+    url: string;
 }
 
 export interface QuizInfo {

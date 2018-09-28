@@ -1,5 +1,5 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
-import { QuizMetadata } from '../../types/flash-card.types';
+import { QuizInfo } from '../../types/flash-card.types';
 
 @Component({
   selector: 'quiz-metadata',
@@ -9,7 +9,7 @@ import { QuizMetadata } from '../../types/flash-card.types';
 export class QuizMetadataComponent {
 
   @Input()
-  quizMetaData: QuizMetadata;
+  quizMetaData: QuizInfo;
 
   @Output()
   edit = new EventEmitter<void>();

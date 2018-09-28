@@ -17,6 +17,7 @@ export class IdbEvolutionService {
     ) {
         this.evolutionSteps = [
             new CreateObjectStore(this.schemaService.quizSchema),
+            new CreateObjectStore(this.schemaService.imageSchema)
         ]
     }
 
@@ -48,13 +49,13 @@ export class IdbEvolutionService {
 
 type DatabaseEvolutionStep = CreateObjectStore<any> | RemoveObjectStore;
 
-class CreateObjectStore<T extends HasId> {
+class CreateObjectStore<A extends HasId, B = A, C = A> {
     type : "create-store" = "create-store";
     database: string;
     store: string;
 
     constructor(
-        schema: PersistenceSchema<T>,
+        schema: PersistenceSchema<A,B,C>,
         public index = "id"
     ) { 
         this.database = schema.idbDatabase;
