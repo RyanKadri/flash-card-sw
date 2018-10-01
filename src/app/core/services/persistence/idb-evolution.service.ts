@@ -1,7 +1,7 @@
 import { Injectable } from "@angular/core";
-import { HasId, State } from "./state";
-import { PersistenceSchemaService } from "./persistence-schema.service";
-import { PersistenceSchema } from "./persistence-types";
+import { HasId, State } from "../state";
+import { PersistenceMetadataService } from "./persistence-metadata.service";
+import { PersistenceMetadata } from "./persistence-types";
 import idb, { UpgradeDB, DB } from 'idb';
 
 @Injectable({ providedIn: 'root' })
@@ -13,7 +13,7 @@ export class IdbEvolutionService {
     }
 
     constructor(
-        private schemaService: PersistenceSchemaService
+        private schemaService: PersistenceMetadataService
     ) {
         this.evolutionSteps = [
             new CreateObjectStore(this.schemaService.quizSchema),
@@ -55,7 +55,7 @@ class CreateObjectStore<A extends HasId, B = A, C = A> {
     store: string;
 
     constructor(
-        schema: PersistenceSchema<A,B,C>,
+        schema: PersistenceMetadata<A,B,C>,
         public index = "id"
     ) { 
         this.database = schema.idbDatabase;

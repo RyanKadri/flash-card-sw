@@ -1,16 +1,16 @@
 import { Injectable } from "@angular/core";
-import { QuizState } from "../../quiz/services/quiz-state";
-import { PersistenceSchema } from "./persistence-types";
-import { QuizInfo, ImageInfo } from "../../quiz/types/flash-card.types";
-import { HasId, State } from "./state";
-import { ImageState } from "../../quiz/services/image-state";
-import { IDBImageData, RemoteImageData } from "../../quiz/services/image-service";
+import { QuizState } from "../../../quiz/services/quiz-state";
+import { PersistenceMetadata } from "./persistence-types";
+import { QuizInfo, ImageInfo } from "../../../quiz/types/flash-card.types";
+import { HasId, State } from "../state";
+import { ImageState } from "../../../quiz/services/image-state";
+import { IDBImageData, RemoteImageData } from "../../../quiz/services/image-service";
 
 @Injectable({ providedIn: 'root'})
-export class PersistenceSchemaService {
+export class PersistenceMetadataService {
 
-    quizSchema: PersistenceSchema<QuizInfo>;
-    imageSchema: PersistenceSchema<ImageInfo, IDBImageData, RemoteImageData>;
+    quizSchema: PersistenceMetadata<QuizInfo>;
+    imageSchema: PersistenceMetadata<ImageInfo, IDBImageData, RemoteImageData>;
 
     constructor(
         quizState: QuizState,

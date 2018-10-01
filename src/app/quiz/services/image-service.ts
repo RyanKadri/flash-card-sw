@@ -1,18 +1,10 @@
 import { Injectable } from "@angular/core";
-import { ImageInfo, FlashCardInfo, FlashCardSide } from "../types/flash-card.types";
-import { PersistenceService } from "../../core/services/persistence-service";
-import { PersistenceSchemaService } from "../../core/services/persistence-schema.service";
-import { FetchSource } from "../../core/services/persistence-types";
+import { FlashCardSide } from "../types/flash-card.types";
 
 @Injectable({
     providedIn: 'root'
 })
 export class ImageService {
-
-    constructor(
-        private persistenceService: PersistenceService,
-        private schemaService: PersistenceSchemaService
-    ) {}
 
     attachImage(side: FlashCardSide, image: File) {
         const oldImage = side.image;
@@ -35,14 +27,6 @@ export class ImageService {
         side.image = undefined;
     }
 
-    persistImage(image: ImageInfo) {
-        this.persistenceService.persist([image], this.schemaService.imageSchema, { shouldPublish: false })
-    }
-
-    fetchImage(id: string) {
-        return this.persistenceService.fetch(this.schemaService.imageSchema, { id }, { source: FetchSource.LOCAL_FIRST })
-            .then(images => images[0]);
-    }
 }
 
 export interface IDBImageData {

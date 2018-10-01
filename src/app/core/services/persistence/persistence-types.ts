@@ -1,4 +1,4 @@
-import { HasId, State } from "./state";
+import { HasId, State } from "../state";
 import { UpgradeDB } from "idb";
 
 export interface FetchOptions {
@@ -7,11 +7,47 @@ export interface FetchOptions {
 }
 
 export interface FetchCriteria<T> {
-    [field: string]: any
+    search: {[ field in keyof T ]?: T[field] }
+    fetch?: FetchGraph<PersistenceSchema<T>>;
+}
+
+export type FetchGraph<T extends PersistenceSchema<any>> = {
+    [field in keyof T["fields"]]: FetchGraph<T["fields"][field]> | true
+}
+
+export interface PersistenceSchema<T> {
+    type: 'top' | 'nested';
+    fields: FieldDefinitions<T>
+}
+
+export class TopLevelSchema<T> implements PersistenceSchema<T> {
+    public type: 'top' = 'top';
+    constructor(public metadata, public fields: FieldDefinitions<T>) { }
+}
+
+export class NestedSchema<T> implements PersistenceSchema<T> {
+    public type: 'nested' = 'nested';
+    constructor(public fields: FieldDefinitions<T>) { }
+}
+
+export type AnySchema<T> = TopLevelSchema<T> | NestedSchema<T>
+
+export type FieldDefinitions<T> = { 
+    [field in keyof T]?: T[field] extends Array<any> 
+        ? AnySchema<T[field][0]> 
+        : AnySchema<T[field]> 
+}
+
+export interface PersistPlan {
+    groups: {
+        store: string;
+        state: State<any>;
+        items: any[];
+    }[]
 }
 
 //Do I want to generalize this to more types of persistence providers? Maybe make each one its own sub-object?
-export interface PersistenceSchema<StateType extends HasId, IDBPersistenceType = StateType, RemotePersistenceType = StateType> {
+export interface PersistenceMetadata<StateType extends HasId, IDBPersistenceType = StateType, RemotePersistenceType = StateType> {
     localState: State<StateType>
 
     idbDatabase: string;
@@ -60,8 +96,8 @@ export enum FetchSource {
 }
 
 export interface PersistenceProvider {
-    fetch<T extends HasId>(schema: PersistenceSchema<T>, criteria?: FetchCriteria<T>): Promise<FetchResult<T[]>>;
-    persist<T extends HasId>(items: T[], schema: PersistenceSchema<T>): Promise<T[]>;
+    fetch<T extends HasId>(schema: TopLevelSchema<T>, criteria?: FetchCriteria<T>): Promise<FetchResult<T[]>>;
+    persist<T extends HasId>(plan: PersistPlan, schema: TopLevelSchema<T>): Promise<void>;
 }
 
 export interface FetchResult<T> {

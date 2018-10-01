@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { map as rxMap } from 'rxjs/operators';
-import { PersistenceService } from '../services/persistence-service';
+import { PersistenceService } from '../services/persistence/persistence-service';
 
 @Component({
   selector: 'app-root',

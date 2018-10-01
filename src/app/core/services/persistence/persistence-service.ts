@@ -1,10 +1,10 @@
 import { Injectable } from "@angular/core";
 import { LocalPersistenceService } from "./local-persistence-service";
-import { State, HasId } from "./state";
+import { HasId, State } from "../state";
 import { RemotePersistenceService } from "./remote-persistence.service";
+import { CompletionGuarantee, FetchSource, PersistenceMetadata, PersistenceOptions, FetchCriteria, PersistenceProvider, FetchStatus, FetchResult, FetchOptions, DeleteOptions, PersistenceSchema, TopLevelSchema, AnySchema, PersistPlan } from "./persistence-types";
 import * as uuidv4 from 'uuid/v4'
-import { CompletionGuarantee, FetchSource, PersistenceSchema, PersistenceOptions, FetchCriteria, PersistenceProvider, FetchStatus, FetchResult, FetchOptions, DeleteOptions } from "./persistence-types";
-import { PersistenceSchemaService } from "./persistence-schema.service";
+
 
 @Injectable({ providedIn: 'root' })
 export class PersistenceService {
@@ -33,20 +33,21 @@ export class PersistenceService {
         return await this.localPersistenceService.initialize();
     }
 
-    async persist<T, IDB = T, Remote = T>(toPersist: T[], schema: PersistenceSchema<T & HasId, IDB, Remote>, options?: Partial<PersistenceOptions>) {
+    async persist<T>(toPersist: T[], schema: TopLevelSchema<T>, options?: Partial<PersistenceOptions>) {
         const fullOptions = { ...this.defaultPersistenceOptions, ...options }
-        const toPersistWithIds = toPersist.map(item => item['id'] ? item : ({ ...item as any, id: uuidv4() })) as (T & HasId)[];
-        schema.localState.upsert(...toPersistWithIds);
+        
+        const plan = this.createPersistPlan(toPersist, schema);
 
-        const localPersist = this.localPersistenceService.persist(toPersistWithIds, schema);
-        let remotePersist: Promise<(T & HasId)[]>;
+        const localPersist = this.localPersistenceService.persist(plan, schema);
+        let remotePersist: Promise<void>;
         if(fullOptions.shouldPublish) {
-            remotePersist = this.remotePersistenceService.persist(toPersistWithIds, schema);
+            remotePersist = this.remotePersistenceService.persist(plan, schema);
         }
+        plan.groups.forEach(group => group.state.upsert(...group.items))
 
         switch(fullOptions.guarantee) {
             case CompletionGuarantee.IN_MEMORY:
-                return Promise.resolve(toPersistWithIds);
+                return Promise.resolve(toPersist);
             case CompletionGuarantee.LOCAL_ONLY:
                 return localPersist;
             case CompletionGuarantee.REMOTE_ONLY:
@@ -56,7 +57,7 @@ export class PersistenceService {
         }
     }
 
-    async fetch<T extends HasId>(schema: PersistenceSchema<T, any, any>, criteria?: FetchCriteria<T>, options?: Partial<FetchOptions>) {
+    async fetch<T extends HasId>(schema: TopLevelSchema<T>, criteria?: FetchCriteria<T>, options?: Partial<FetchOptions>) {
         const fullOptions = { ...this.defaultFetchOptions, ...options };
         let firstProvider: PersistenceProvider;
         let fallback: PersistenceProvider;
@@ -97,15 +98,15 @@ export class PersistenceService {
             }
             return retryRes.result;
         } else {
-            schema.localState.upsert(...res);
+            schema.metadata.localState.upsert(...res);
             return res;
         }
     }
 
-    async delete<T extends HasId>(toDelete: T[], schema: PersistenceSchema<T & HasId>, options?: Partial<DeleteOptions>) {
+    async delete<T extends HasId>(toDelete: T[], schema: TopLevelSchema<T>, options?: Partial<DeleteOptions>) {
         const fullOptions = { ...this.defaultDeletionOptions, ...options }
 
-        schema.localState.delete( ...toDelete );
+        schema.metadata.localState.delete( ...toDelete );
 
         const localDelete = this.localPersistenceService.delete(toDelete, schema);
         let remoteDelete: Promise<(T & HasId)[]>;
@@ -122,6 +123,63 @@ export class PersistenceService {
                 return remoteDelete;
             case CompletionGuarantee.LOCAL_AND_REMOTE:
                 return Promise.all([localDelete, remoteDelete]).then(res => res[0]);
+        }
+    }
+
+    private createPersistPlan<T>(items: T[], schema: TopLevelSchema<T>) {
+        const persistMap = new Map<string, { state: State<any>, items: any[]}>(); // Object Store -> Objects being persisted
+
+        items.forEach(item => persistPlan(item, schema));
+        const plan: PersistPlan = { groups: [] }
+        for(const [key, vals] of persistMap.entries()) {
+            plan.groups.push({ store: key, state: vals.state, items: vals.items });
+        }
+        return plan;
+
+        function persistPlan(item: T, schema: AnySchema<T>) {
+            const replacements = {};
+            for(const entry of Object.entries(schema.fields)) {
+                const field = entry[0];
+                const graphNode = entry[1] as AnySchema<any>;
+
+                if(!item[field]) {
+                    continue;
+                } else {
+                    if(item[field] instanceof Array) {
+                        replacements[field] = item[field].map(inner => persistPlan(inner, graphNode));
+                    } else {
+                        replacements[field] = persistPlan(item[field], graphNode);
+                    }
+                }
+            }
+            const res = Object.entries(item).reduce((acc, [field, val]) => {
+                if(replacements[field]) {
+                    acc[field] = replacements[field];
+                } else {
+                    acc[field] = val;
+                }
+                return acc;
+            }, {})
+
+            if(schema.type === 'top') {
+                const key = schema.metadata.idbObjectStore;
+                let toPersist;
+                let newItem;
+                if(res['id'] === undefined) {
+                    newItem = {...res, id: uuidv4()}
+                } else {
+                    newItem = res;
+                }
+                if(!persistMap.has(key)) {
+                    toPersist = { state: schema.metadata.localState, items: [ newItem ] }
+                } else {
+                    toPersist = { state: schema.metadata.localState, items: [...persistMap.get(key).items, newItem]}
+                }
+                persistMap.set(key, toPersist);
+                return newItem['id'];
+            } else {
+                return res;
+            }
         }
     }
 

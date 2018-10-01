@@ -73,12 +73,6 @@ export class FlashCardPanel implements OnInit, OnChanges {
         if(this.openWithEdit) {
             this.editing = true;
         }
-        if(this._card.definition.image) {
-            this.imageService.fetchImage(this._card.definition.image.id).then(image => this._card.definition.image = image);
-        }
-        if(this._card.term.image) {
-            this.imageService.fetchImage(this._card.term.image.id).then(image => this._card.term.image = image);
-        } 
     }
 
     edit() {
@@ -117,7 +111,7 @@ export class FlashCardPanel implements OnInit, OnChanges {
         const input = e.target as HTMLInputElement;
         if(input.files && input.files.length === 1) {
             const file = input.files[0];
-            this.card.term = this.imageService.attachImage(this.currentSide, file);
+            this._card.term = this.imageService.attachImage(this.currentSide, file);
         }
     }
 
