@@ -96,14 +96,19 @@ export enum FetchSource {
 }
 
 export interface PersistenceProvider {
-    fetch<T extends HasId>(schema: TopLevelSchema<T>, criteria?: FetchCriteria<T>): Promise<FetchResult<T[]>>;
+    fetch<T extends HasId>(schema: TopLevelSchema<T>, criteria?: FetchCriteria<T>): Promise<FetchResult<T>>;
     persist<T extends HasId>(plan: PersistPlan, schema: TopLevelSchema<T>): Promise<void>;
 }
 
 export interface FetchResult<T> {
-    result?: T,
-    status?: FetchStatus;
-    error?: FetchError;
+    groups: FetchGroup<T>[];
+    error: boolean;
+    status: FetchStatus;
+}
+
+export interface FetchGroup<T> {
+    schema: TopLevelSchema<T>;
+    results: T[];
 }
 
 export enum FetchStatus {

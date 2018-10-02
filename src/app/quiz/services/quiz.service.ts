@@ -18,8 +18,8 @@ export class QuizService {
         this.quizSchema = this.schemaService.quizSchema;
     }
 
-    fetchQuizzes() : Promise<QuizInfo[]>{
-        return this.persistenceService.fetch(this.quizSchema, { search: {} }, { source: FetchSource.LOCAL_FIRST });
+    async fetchQuizzes() : Promise<void>{
+        await this.persistenceService.fetch(this.quizSchema, { search: {} }, { source: FetchSource.LOCAL_FIRST });
     }
 
     fetchQuiz(id: string) {

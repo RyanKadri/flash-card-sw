@@ -15,10 +15,14 @@ export class RemotePersistenceService implements PersistenceProvider {
         await this.http.put<T[]>(url, plan.groups, { responseType: 'json' }).toPromise()
     }
 
-    async fetch<T extends HasId>(schema: TopLevelSchema<any>, criteria: FetchCriteria<T>): Promise<FetchResult<T[]>> {
+    async fetch<T extends HasId>(schema: TopLevelSchema<any>, criteria: FetchCriteria<T>) {
         const url = schema.metadata.remoteResourceBulk;
         const res = await this.http.get<T[]>(url).toPromise();
-        return { result: res, status: FetchStatus.OK }
+        return {
+            status: FetchStatus.OK,
+            error: false,
+            groups: []
+        }
     }
 
     async delete<T extends HasId>(toPersist: T[], schema: TopLevelSchema<T>): Promise<T[]> {

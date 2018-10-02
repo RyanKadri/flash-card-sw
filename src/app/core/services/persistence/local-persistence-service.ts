@@ -1,5 +1,5 @@
 import { Injectable } from "@angular/core";
-import idb from 'idb';
+import idb, { Transaction } from 'idb';
 import { HasId } from "../state";
 import { PersistenceProvider, FetchCriteria, FetchStatus, FetchGraph, PersistenceSchema, TopLevelSchema, AnySchema, FieldDefinitions, PersistPlan } from "./persistence-types";
 import { IdbEvolutionService } from "./idb-evolution.service";
@@ -48,25 +48,82 @@ export class LocalPersistenceService implements PersistenceProvider {
 
     async fetch<T extends HasId>(schema: TopLevelSchema<T>, criteria: FetchCriteria<T>) {
         const db = await idb.open(schema.metadata.idbDatabase, this.databaseVersion);
-        const execInfo = this.extractExecInfo(criteria.fetch, schema);
-        console.log(execInfo);
-        const tx = db.transaction(execInfo.stores, 'readonly');
-        const store = tx.objectStore(execInfo.stores[0]);
-        let result;
+        const stores = this.determineStores(criteria.fetch, schema);
+        console.log(stores);
+        const tx = db.transaction(stores, 'readonly');
+        const initStore = tx.objectStore(stores[0]);
+        let initRes;
         if(Object.keys(criteria.search).length === 0) {
-            result = await store.getAll() as T[];
+            initRes = await initStore.getAll() as T[];
         } else {
             if(criteria.search.id) {
-                result = await store.get(criteria.search.id);
+                initRes = [await initStore.get(criteria.search.id)];
             } else {
                 throw new Error('Not sure yet how to make generic queries')
             }
         }
+        const graph = await this.fetchLinked(tx, initRes, criteria.fetch, schema);
         await tx.complete;
         db.close();
+        return graph;
+    }
+
+    private async fetchLinked<T>(tx: Transaction, startingFrom: T[], fetch: FetchGraph<PersistenceSchema<T>>, schema: TopLevelSchema<T>) {
+        const fetchMap = new Map<TopLevelSchema<any>, any[]>();
+        fetchMap.set(schema, startingFrom);
+        if(fetch) {
+            await traverse(startingFrom, fetch, schema);
+        }
+
+        async function traverse(items: T[], fetch: FetchGraph<any>, schema: AnySchema<T>) {
+            for(const entry of Object.entries(fetch)) {
+                const key = entry[0];
+                const subgraph = entry[1] as FetchGraph<any>;
+
+                const nestedSchema = schema.fields[key] as AnySchema<any>;
+                if(nestedSchema.type === 'top') {
+                    const store = tx.objectStore(nestedSchema.metadata.idbObjectStore);
+                    const toFetch = unpack(items, key)
+                        .map(el => store.get(el));
+                    const children = await Promise.all(toFetch);
+                    children.forEach(child => {
+                        fetchMap.set(nestedSchema, (fetchMap.get(child.id) || []).concat(child));
+                    })
+                    if(typeof subgraph !== 'boolean' && typeof subgraph !== 'undefined') {
+                        await traverse(children, subgraph, nestedSchema);
+                    }
+                } else {
+                    const children = unpack(items, key);
+                    if(typeof subgraph !== 'boolean' && typeof subgraph !== 'undefined') {
+                        await traverse(children, subgraph, nestedSchema);
+                    }
+                }
+            }
+        }
+
+        function unpack(items: T[], key: string): any[] {
+            if(!items || items.length === 0) return [];
+            if(!Array.isArray(items[0][key])) {
+                return items
+                    .filter(item => item[key] !== undefined)
+                    .map(item => item[key]);
+            } else {
+                const res = [];
+                for(const item of items) {
+                    for(const el of (<any> item[key])) {
+                        res.push(el);
+                    }
+                }
+                return res;
+            }
+        }
+
         return {
-            result,
-            status: FetchStatus.OK
+            error: false,
+            status: FetchStatus.OK,
+            groups: Array.from(fetchMap.entries()).map(([schema, items]) => ({
+                schema, results: items
+            }))
         };
     }
 
@@ -85,27 +142,22 @@ export class LocalPersistenceService implements PersistenceProvider {
         return this.persistentStorage;
     }
 
-    private extractExecInfo<T>(fetchGraph: FetchGraph<PersistenceSchema<T>>, schema: TopLevelSchema<T>) {
+    private determineStores<T>(fetchGraph: FetchGraph<PersistenceSchema<T>>, schema: TopLevelSchema<T>) {
         const stores = new Set<string>();
-        const fetchPaths = [];
         stores.add(schema.metadata.idbObjectStore);
         if(fetchGraph) {
             traverse(fetchGraph, schema);
         }
-        return {
-            stores: Array.from(stores),
-            fetchPaths
-        };
+        return Array.from(stores);
 
-        function traverse(graph: FetchGraph<any>, schema: AnySchema<T>, keypath: string[] = []) {
+        function traverse(graph: FetchGraph<any>, schema: AnySchema<T>) {
             for(const [key, subgraph] of Object.entries(graph)) {
                 const subSchema: AnySchema<any> = schema.fields[key];
                 if(subSchema.type === 'top') {
-                    fetchPaths.push(keypath.concat(key));
                     stores.add(subSchema.metadata.idbObjectStore);
                 }
                 if(typeof subgraph !== 'boolean') {
-                    traverse(subgraph, subSchema, [...keypath, key]);
+                    traverse(subgraph, subSchema);
                 }
             }
         }

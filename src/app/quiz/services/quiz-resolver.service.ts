@@ -6,7 +6,7 @@ import { QuizInfo } from '../types/flash-card.types';
 @Injectable({
   providedIn: 'root'
 })
-export class QuizResolver implements Resolve<QuizInfo[]> {
+export class QuizResolver implements Resolve<void> {
 
   constructor(
     private quizService: QuizService

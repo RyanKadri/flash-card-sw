@@ -5,6 +5,7 @@ import { QuizService } from "../../services/quiz.service";
 import { MatChipInputEvent } from "@angular/material";
 import { ENTER, COMMA } from '@angular/cdk/keycodes'
 import { QuizState } from "../../services/quiz-state";
+import { ImageState } from "../../services/image-state";
 
 @Component({
     selector: 'create-quiz-view',
@@ -16,6 +17,7 @@ export class CreateQuizView implements OnInit {
     constructor(
         private quizService: QuizService,
         private quizState: QuizState,
+        private imageState: ImageState,
         private router: Router,
         private route: ActivatedRoute
     ) { }
@@ -28,12 +30,12 @@ export class CreateQuizView implements OnInit {
         description: "",
         tags: [],
         cards: [{ term: { value: "" }, definition: { value: "" }, temp: true} as FlashCardInfo]
-    }
+    } 
 
-    largeScreen: boolean = false;
+    largeScreen: boolean = false; 
     supportsHover = false;
 
-    ngOnInit() {
+    ngOnInit() { 
         const sizeMedia = matchMedia('(min-width: 700px)');
         this.largeScreen = sizeMedia.matches;
         sizeMedia.addListener((evt) => {

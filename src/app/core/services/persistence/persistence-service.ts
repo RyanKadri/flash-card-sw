@@ -2,7 +2,7 @@ import { Injectable } from "@angular/core";
 import { LocalPersistenceService } from "./local-persistence-service";
 import { HasId, State } from "../state";
 import { RemotePersistenceService } from "./remote-persistence.service";
-import { CompletionGuarantee, FetchSource, PersistenceMetadata, PersistenceOptions, FetchCriteria, PersistenceProvider, FetchStatus, FetchResult, FetchOptions, DeleteOptions, PersistenceSchema, TopLevelSchema, AnySchema, PersistPlan } from "./persistence-types";
+import { CompletionGuarantee, FetchSource, PersistenceMetadata, PersistenceOptions, FetchCriteria, PersistenceProvider, FetchStatus, FetchResult, FetchOptions, DeleteOptions, PersistenceSchema, TopLevelSchema, AnySchema, PersistPlan, FetchGroup } from "./persistence-types";
 import * as uuidv4 from 'uuid/v4'
 
 
@@ -74,7 +74,7 @@ export class PersistenceService {
 
         let failed = false;
         let retry = false;
-        let res: T[];
+        let groups: FetchGroup<T>[];
         try {
             const fetchRes = await firstProvider.fetch(schema, criteria)
             if(fetchRes.error) {
@@ -82,24 +82,25 @@ export class PersistenceService {
             } else if(fetchRes.status === FetchStatus.INCOMPLETE_RESULT || fetchRes.status === FetchStatus.OUTDATED_RESULT) {
                 retry = true;
             } else {
-                res = fetchRes.result;
+                groups = fetchRes.groups;
             }
         } catch(e) {
+            console.error(e);
             failed = true;
         }
 
         if(failed || retry) {
-            let retryRes: FetchResult<T[]>;
+            let retryRes: FetchResult<T>;
             if(fallback) {
                 retryRes = await fallback.fetch(schema, criteria);
             }
             if(!retryRes || retryRes.error) {
                 throw new Error("Failed to fetch requested items")
             }
-            return retryRes.result;
+            return retryRes.groups;
         } else {
-            schema.metadata.localState.upsert(...res);
-            return res;
+            groups.forEach(group => group.schema.metadata.localState.upsert(...group.results));
+            return groups;
         }
     }
 
