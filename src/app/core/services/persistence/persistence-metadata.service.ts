@@ -2,7 +2,7 @@ import { Injectable } from "@angular/core";
 import { QuizState } from "../../../quiz/services/quiz-state";
 import { PersistenceMetadata } from "./persistence-types";
 import { QuizInfo, ImageInfo } from "../../../quiz/types/flash-card.types";
-import { HasId, State } from "../state";
+import { HasId, StateBase } from "../state";
 import { ImageState } from "../../../quiz/services/image-state";
 import { IDBImageData, RemoteImageData } from "../../../quiz/services/image-service";
 

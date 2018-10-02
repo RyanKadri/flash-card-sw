@@ -6,6 +6,7 @@ import { MatChipInputEvent } from "@angular/material";
 import { ENTER, COMMA } from '@angular/cdk/keycodes'
 import { QuizState } from "../../services/quiz-state";
 import { ImageState } from "../../services/image-state";
+import { map } from "rxjs/operators";
 
 @Component({
     selector: 'create-quiz-view',
@@ -49,11 +50,20 @@ export class CreateQuizView implements OnInit {
         });
 
         if(this.route.snapshot.params.quizId) {
-            this.quizState.select().subscribe(quizzes => {
-                this.quiz = quizzes.find(quiz => quiz.id === this.route.snapshot.params.quizId);
-                this.editMetadata = false;
-                this.editMode = true;
-            })
+            this.quizState
+                .where({
+                    id: this.route.snapshot.params.quizId
+                })
+                .join({ cards: {
+                    term: { image: true },
+                    definition: { image: true }
+                }})
+                .select({ unique: true })
+                .subscribe(quiz => {
+                    this.quiz = quiz;
+                    this.editMetadata = false;
+                    this.editMode = true;
+                })
         }
     }
 

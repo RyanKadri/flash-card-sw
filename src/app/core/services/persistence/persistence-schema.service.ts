@@ -2,32 +2,37 @@ import { Injectable } from "@angular/core";
 import { PersistenceMetadataService } from "./persistence-metadata.service";
 import { TopLevelSchema, NestedSchema } from "./persistence-types";
 import { QuizInfo, FlashCardInfo, FlashCardSide, ImageInfo } from "../../../quiz/types/flash-card.types";
+import { SchemaRegistryService } from "./schema-registry.service";
+import { IMAGE, QUIZ, CARD_SIDE, CARD } from "./schemaTypeToken";
 
 @Injectable({
     providedIn: 'root'
 })
 export class PersistenceSchemaService {
 
-    public readonly quizSchema: TopLevelSchema<QuizInfo>;
-    public readonly cardSchema: NestedSchema<FlashCardInfo>;
-    public readonly cardSideSchema: NestedSchema<FlashCardSide>;
-    public readonly imageSchema: TopLevelSchema<ImageInfo>
-
     constructor(
-        private metadataService: PersistenceMetadataService
-    ) {
-        this.imageSchema = new TopLevelSchema<ImageInfo>(this.metadataService.imageSchema, {
-
+        private metadataService: PersistenceMetadataService,
+        private schemaRegistry: SchemaRegistryService
+    ) { }
+    
+    initialize() {
+        const imageSchema = new TopLevelSchema<ImageInfo>(this.metadataService.imageSchema, {
+    
         })
-        this.cardSideSchema = new NestedSchema<FlashCardSide>({
-            image: this.imageSchema
+        const cardSideSchema = new NestedSchema<FlashCardSide>({
+            image: imageSchema
         })
-        this.cardSchema = new NestedSchema<FlashCardInfo>({
-            term: this.cardSideSchema,
-            definition: this.cardSideSchema
+        const cardSchema = new NestedSchema<FlashCardInfo>({
+            term: cardSideSchema,
+            definition: cardSideSchema
         })
-        this.quizSchema = new TopLevelSchema<QuizInfo>(this.metadataService.quizSchema, {
-            cards: this.cardSchema
+        const quizSchema = new TopLevelSchema<QuizInfo>(this.metadataService.quizSchema, {
+            cards: cardSchema
         })
+    
+        this.schemaRegistry.registerSchema(IMAGE, imageSchema)
+        this.schemaRegistry.registerSchema(CARD_SIDE, cardSideSchema)
+        this.schemaRegistry.registerSchema(CARD, cardSchema)
+        this.schemaRegistry.registerSchema(QUIZ, quizSchema)
     }
 }

@@ -1,9 +1,11 @@
 import { Injectable } from "@angular/core";
 import { LocalPersistenceService } from "./local-persistence-service";
-import { HasId, State } from "../state";
+import { HasId, StateBase } from "../state";
 import { RemotePersistenceService } from "./remote-persistence.service";
 import { CompletionGuarantee, FetchSource, PersistenceMetadata, PersistenceOptions, FetchCriteria, PersistenceProvider, FetchStatus, FetchResult, FetchOptions, DeleteOptions, PersistenceSchema, TopLevelSchema, AnySchema, PersistPlan, FetchGroup } from "./persistence-types";
 import * as uuidv4 from 'uuid/v4'
+import { SchemaTypeToken } from "./schemaTypeToken";
+import { SchemaRegistryService } from "./schema-registry.service";
 
 
 @Injectable({ providedIn: 'root' })
@@ -27,15 +29,17 @@ export class PersistenceService {
     constructor(
         private localPersistenceService: LocalPersistenceService,
         private remotePersistenceService: RemotePersistenceService,
+        private schemaRegistry: SchemaRegistryService
     ) { }
 
     async initialize() {
         return await this.localPersistenceService.initialize();
     }
 
-    async persist<T>(toPersist: T[], schema: TopLevelSchema<T>, options?: Partial<PersistenceOptions>) {
+    async persist<T>(toPersist: T[], type: SchemaTypeToken<T>, options?: Partial<PersistenceOptions>) {
         const fullOptions = { ...this.defaultPersistenceOptions, ...options }
         
+        const schema = this.assertTopLevelSchema(this.schemaRegistry.fetchSchema(type));
         const plan = this.createPersistPlan(toPersist, schema);
 
         const localPersist = this.localPersistenceService.persist(plan, schema);
@@ -57,10 +61,11 @@ export class PersistenceService {
         }
     }
 
-    async fetch<T extends HasId>(schema: TopLevelSchema<T>, criteria?: FetchCriteria<T>, options?: Partial<FetchOptions>) {
+    async fetch<T extends HasId>(type: SchemaTypeToken<T>, criteria?: FetchCriteria<T>, options?: Partial<FetchOptions>) {
         const fullOptions = { ...this.defaultFetchOptions, ...options };
         let firstProvider: PersistenceProvider;
         let fallback: PersistenceProvider;
+        const schema = this.assertTopLevelSchema(this.schemaRegistry.fetchSchema(type));
 
         if(fullOptions.source === FetchSource.LOCAL_FIRST) {
             firstProvider = this.localPersistenceService;
@@ -104,8 +109,9 @@ export class PersistenceService {
         }
     }
 
-    async delete<T extends HasId>(toDelete: T[], schema: TopLevelSchema<T>, options?: Partial<DeleteOptions>) {
+    async delete<T extends HasId>(toDelete: T[], type: SchemaTypeToken<T>, options?: Partial<DeleteOptions>) {
         const fullOptions = { ...this.defaultDeletionOptions, ...options }
+        const schema = this.assertTopLevelSchema(this.schemaRegistry.fetchSchema(type));
 
         schema.metadata.localState.delete( ...toDelete );
 
@@ -128,7 +134,7 @@ export class PersistenceService {
     }
 
     private createPersistPlan<T>(items: T[], schema: TopLevelSchema<T>) {
-        const persistMap = new Map<string, { state: State<any>, items: any[]}>(); // Object Store -> Objects being persisted
+        const persistMap = new Map<string, { state: StateBase<any>, items: any[]}>(); // Object Store -> Objects being persisted
 
         items.forEach(item => persistPlan(item, schema));
         const plan: PersistPlan = { groups: [] }
@@ -184,4 +190,8 @@ export class PersistenceService {
         }
     }
 
+    private assertTopLevelSchema<T>(schema: AnySchema<T>): TopLevelSchema<T> {
+        if(schema.type !== 'top') throw new Error('You must pass a top-level schema');
+        return schema;
+    }
 }

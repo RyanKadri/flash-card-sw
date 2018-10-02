@@ -1,5 +1,5 @@
 import { Injectable } from "@angular/core";
-import { HasId, State } from "../state";
+import { HasId, StateBase } from "../state";
 import { PersistenceMetadataService } from "./persistence-metadata.service";
 import { PersistenceMetadata } from "./persistence-types";
 import idb, { UpgradeDB, DB } from 'idb';

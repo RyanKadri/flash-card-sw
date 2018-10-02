@@ -3,6 +3,7 @@ import idb, { Transaction } from 'idb';
 import { HasId } from "../state";
 import { PersistenceProvider, FetchCriteria, FetchStatus, FetchGraph, PersistenceSchema, TopLevelSchema, AnySchema, FieldDefinitions, PersistPlan } from "./persistence-types";
 import { IdbEvolutionService } from "./idb-evolution.service";
+import { extractTopLevelInfo } from "../static-libs";
 
 const nav: Navigator & {storage: 
     { persist: () => Promise<boolean>, persisted: () => Promise<boolean> }} = window.navigator as any
@@ -48,7 +49,8 @@ export class LocalPersistenceService implements PersistenceProvider {
 
     async fetch<T extends HasId>(schema: TopLevelSchema<T>, criteria: FetchCriteria<T>) {
         const db = await idb.open(schema.metadata.idbDatabase, this.databaseVersion);
-        const stores = this.determineStores(criteria.fetch, schema);
+        const stores = extractTopLevelInfo(criteria.fetch, schema, schema => schema.metadata.idbObjectStore);
+        
         console.log(stores);
         const tx = db.transaction(stores, 'readonly');
         const initStore = tx.objectStore(stores[0]);
@@ -142,26 +144,6 @@ export class LocalPersistenceService implements PersistenceProvider {
         return this.persistentStorage;
     }
 
-    private determineStores<T>(fetchGraph: FetchGraph<PersistenceSchema<T>>, schema: TopLevelSchema<T>) {
-        const stores = new Set<string>();
-        stores.add(schema.metadata.idbObjectStore);
-        if(fetchGraph) {
-            traverse(fetchGraph, schema);
-        }
-        return Array.from(stores);
-
-        function traverse(graph: FetchGraph<any>, schema: AnySchema<T>) {
-            for(const [key, subgraph] of Object.entries(graph)) {
-                const subSchema: AnySchema<any> = schema.fields[key];
-                if(subSchema.type === 'top') {
-                    stores.add(subSchema.metadata.idbObjectStore);
-                }
-                if(typeof subgraph !== 'boolean') {
-                    traverse(subgraph, subSchema);
-                }
-            }
-        }
-    }
 }
 
 interface DatabaseInfo {

@@ -1,4 +1,4 @@
-import { HasId, State } from "../state";
+import { HasId, StateBase } from "../state";
 import { UpgradeDB } from "idb";
 
 export interface FetchOptions {
@@ -15,6 +15,8 @@ export type FetchGraph<T extends PersistenceSchema<any>> = {
     [field in keyof T["fields"]]: FetchGraph<T["fields"][field]> | true
 }
 
+type StripAray<T> = T extends Array<any> ? T[0] : T;
+
 export interface PersistenceSchema<T> {
     type: 'top' | 'nested';
     fields: FieldDefinitions<T>
@@ -22,7 +24,7 @@ export interface PersistenceSchema<T> {
 
 export class TopLevelSchema<T> implements PersistenceSchema<T> {
     public type: 'top' = 'top';
-    constructor(public metadata, public fields: FieldDefinitions<T>) { }
+    constructor(public metadata: PersistenceMetadata<T, any, any>, public fields: FieldDefinitions<T>) { }
 }
 
 export class NestedSchema<T> implements PersistenceSchema<T> {
@@ -41,14 +43,14 @@ export type FieldDefinitions<T> = {
 export interface PersistPlan {
     groups: {
         store: string;
-        state: State<any>;
+        state: StateBase<any>;
         items: any[];
     }[]
 }
 
 //Do I want to generalize this to more types of persistence providers? Maybe make each one its own sub-object?
 export interface PersistenceMetadata<StateType extends HasId, IDBPersistenceType = StateType, RemotePersistenceType = StateType> {
-    localState: State<StateType>
+    localState: StateBase<StateType>
 
     idbDatabase: string;
     idbObjectStore: string;
