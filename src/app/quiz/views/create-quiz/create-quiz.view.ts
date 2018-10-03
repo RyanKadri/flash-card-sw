@@ -99,10 +99,9 @@ export class CreateQuizView implements OnInit {
         
     }
 
+    //TODO - Can this be immutable without screwing up everything on edit?
     updateCard(updated: FlashCardInfo, ind: number) {
-        const newCards = [...this.quiz.cards];
-        newCards[ind] = updated;
-        this.quiz = { ...this.quiz, cards: newCards };
+        this.quiz.cards[ind] = updated;
         delete updated['temp'];
         this.quickSave();
     }

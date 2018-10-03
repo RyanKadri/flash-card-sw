@@ -1,21 +1,23 @@
-<ng-container *ngIf="quizzes.length > 0; else noQuizzes">
-  <h3 class="section-header">Available Quizzes</h3>
-  <div class="quiz-selection-area">
-    <div (click)="createQuiz()" class="quiz-card mat-elevation-z3">
+<h3 class="section-header">Available Quizzes</h3>
+
+
+<div class="quiz-selection-area">
+  <div (click)="createQuiz()" class="quiz-card create-card mat-elevation-z3">
+    <section class="body">
       <header class="title">
         <h3>Create a Quiz</h3>
-        <button mat-icon-button class="icon-button-small edit">
+        <button mat-icon-button class="icon-button">
           <mat-icon>add</mat-icon>
         </button>
       </header>
-    </div>
-    <div (click)="playQuiz(quiz)" class="quiz-card mat-elevation-z3" *ngFor="let quiz of quizzes">
+    </section>
+  </div>
+  <div (click)="playQuiz(quiz)" class="quiz-card mat-elevation-z3" *ngFor="let quiz of quizzes">
+    <section class="body">
       <header class="title">
         <h3>{{ quiz.name }}</h3>
         <small> {{ quiz.cards.length }} card{{ quiz.cards.length > 0 ? 's': ''}}</small>
-        <button mat-icon-button class="icon-button-small edit" [matMenuTriggerFor]="menu" (click)="$event.stopPropagation()">
-          <mat-icon>more_vert</mat-icon>
-        </button>
+        
         <mat-menu #menu="matMenu">
           <button mat-menu-item (click)="edit(quiz)">
             <span>Edit</span>
@@ -25,14 +27,16 @@
           </button>
         </mat-menu>
       </header>
-      <div></div>
-      <section>
-        <p>{{ quiz.description }}</p>
-      </section>
-    </div>
+      <p>{{ quiz.description }}</p>
+    </section>
+    <hr />
+    <footer (click)="$event.stopPropagation()">
+      <button mat-icon-button (click)="edit(quiz)">
+        <mat-icon>edit</mat-icon>
+      </button>
+      <button mat-icon-button (click)="delete(quiz)">
+        <mat-icon>delete</mat-icon>
+      </button>
+    </footer>
   </div>
-</ng-container>
-<ng-template #noQuizzes>
-  <h3 class="section-header">Your Quizzes</h3>
-  <p>You have no quizzes. <a [routerLink]="['/create']">Create</a> a quiz?</p>
-</ng-template>
+</div>

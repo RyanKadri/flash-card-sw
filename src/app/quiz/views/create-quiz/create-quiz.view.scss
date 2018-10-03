@@ -1,3 +1,5 @@
+@import 'responsive-breaks';
+
 :host {
     display: grid;
     grid-template-areas: "metadata-summary metadata-summary" "metadata-entry quiz-area";
@@ -47,21 +49,40 @@ flash-card-panel, .create {
 .insert-button {
     display: none;
     position: absolute;
-    top: 50%;
     z-index:4;
-    &.before {
-        left: 0px;
-        transform: translate(-25px, -50%);
+
+    @media (min-width: $small-width + 1) {
+        top: 50%;
+        &.before {
+            left: 0px;
+            transform: translate(-25px, -50%);
+        }
+        &.after {
+            left: 100%;
+            transform: translate(25px, -50%);
+        }
     }
-    &.after {
-        right: 0px;
-        transform: translate(25px, -50%);
+
+    @media (max-width: $small-width) {
+        left: 50%;
+        &.before {
+            top: 0px;
+            transform: translate(-50%, -20px);
+        }
+        &.after {
+            top: 100%;
+            transform: translate(-50%, -20px);
+        }
     }
 
     @media (pointer: fine) {
         .card-container:hover & {
             display: block;
         }
+    }
+
+    &.sticky {
+        display: block;
     }
 }
 
