@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation, ChangeDetectionStrategy, Input, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, ViewEncapsulation, ChangeDetectionStrategy, Input, Output, EventEmitter, OnChanges } from '@angular/core';
 import { QuizInfo, FlashCardInfo } from '../../types/flash-card.types';
 import { trigger, state, style, transition, animate } from '@angular/animations';
 
@@ -7,39 +7,39 @@ import { trigger, state, style, transition, animate } from '@angular/animations'
   templateUrl: './quiz-game-area.component.html',
   styleUrls: ['./quiz-game-area.component.scss'],
   encapsulation: ViewEncapsulation.Emulated,
-  changeDetection: ChangeDetectionStrategy.Default,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   animations: [
-    trigger('cardState', [
-      transition('void => *', [
-        style({
-          transform: 'translateX(-100%)'
-        }),
-        animate('500ms ease-out')
+    trigger('cardPos', [
+      state('before', style({ transform: 'translateX(-100%)', opacity: 0 })),
+      state('after', style({ transform: 'translateX(100%)', opacity: 0 })),
+      state('current', style({ transform: 'translateX(0%)'})),
+      transition('* <=> *', [
+        animate('150ms ease-out')
       ]),
-      transition('* => void', [
-        animate('500ms ease-in', style({ transform: 'translateX(100%' }))
-      ])
     ])
   ]
 })
-export class QuizGameCardComponent implements OnInit {
+export class QuizGameCardComponent implements OnChanges {
 
   constructor() { }
 
-  ngOnInit() {
+  ngOnChanges() {
+
   }
 
   @Input()
   cards: FlashCardInfo[]
 
   @Input()
-  currentCard: number
+  currentCard = 0
 
   @Output()
   currentCardChange = new EventEmitter<number>()
 
-  get card() {
-    return this.cards[this.currentCard]
+  private readonly STACK_DEPTH = 2;
+
+  get stack() {
+    return this.cards.slice(Math.max(0, this.currentCard - this.STACK_DEPTH), Math.min(this.currentCard + this.STACK_DEPTH, this.cards.length));
   }
 
   next() {
@@ -51,6 +51,17 @@ export class QuizGameCardComponent implements OnInit {
   previous() {
     if(this.currentCard > 0) {
       this.currentCardChange.emit(this.currentCard - 1);
+    }
+  }
+
+  calcState(card: FlashCardInfo) {
+    const pos = this.cards.indexOf(card);
+    if(pos < this.currentCard) {
+      return 'before';
+    } else if(pos > this.currentCard) {
+      return 'after';
+    } else {
+      return 'current';
     }
   }
 

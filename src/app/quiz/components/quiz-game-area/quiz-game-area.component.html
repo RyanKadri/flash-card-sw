@@ -1,5 +1,7 @@
-<div class="card-container" (swipeleft)="next()" (swiperight)="previous()" @cardState>
-  <flash-card-panel [card]="card"></flash-card-panel>
+<div class="card-container" (swipeleft)="next()" (swiperight)="previous()">
+  <ng-container *ngFor="let card of stack; let ind = index">
+    <flash-card-panel [@cardPos]="calcState(card)" [card]="card"></flash-card-panel>
+  </ng-container>
   <button mat-icon-button class="card-control left" (click)="previous()" [disabled]="currentCard === 0">
     <mat-icon>chevron_left</mat-icon>
   </button>

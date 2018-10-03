@@ -101,6 +101,7 @@ export class FlashCardPanel implements OnInit, OnChanges {
 
     pressEnter(e: KeyboardEvent) {
         if(!e.shiftKey) {
+            e.preventDefault();
             if((this.termSide && !this.card.definition.value) || (!this.termSide && !this.card.term.value)) {
                 this.flip();
             } else {
