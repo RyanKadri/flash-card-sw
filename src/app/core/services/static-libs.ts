@@ -1,4 +1,6 @@
-import { FetchGraph, AnySchema, PersistenceSchema, TopLevelSchema } from "./persistence/persistence-types";
+import { FetchGraph, AnySchema, PersistenceSchema, TopLevelSchema, FieldDefinition, FieldLink } from "./persistence/persistence-types";
+import { SchemaRegistryService } from "./persistence/schema-registry.service";
+import { SchemaTypeToken } from "./persistence/schemaTypeToken";
 
 export function join
     <B extends{[k in BK]: string[]}, J, BK extends keyof B, P extends string>
@@ -40,15 +42,17 @@ export function join(toJoin, joinMap, baseKey, projectTo) {
     }
 }
 
-export function extractTopLevelInfo<T, R>(graph: FetchGraph<PersistenceSchema<T>>, schema: TopLevelSchema<T>, extract: (schema: TopLevelSchema<T>) => R) {
+export function extractTopLevelInfo<T, R>(graph: FetchGraph<T>, schema: TopLevelSchema<T>, schemaRegistry: SchemaRegistryService, extract: (schema: TopLevelSchema<any>) => R) {
     const results = new Set<R>()
     results.add(extract(schema));
     if(graph) {
         traverse(graph, schema);
     }
-    function traverse(graph: FetchGraph<PersistenceSchema<T>>, schema: AnySchema<T>) {    
+    function traverse(graph: FetchGraph<any>, schema: AnySchema<any>) {    
         for(const [key, subgraph] of Object.entries(graph)) {
-            const subSchema: AnySchema<any> = schema.fields[key];
+            const fieldDef = schema.fields[key as keyof T];
+            const [subSchema] = extractSchemaFromDef(fieldDef, schemaRegistry);
+            
             if(subSchema.type === 'top') {
                 results.add(extract(subSchema));
             }
@@ -58,4 +62,18 @@ export function extractTopLevelInfo<T, R>(graph: FetchGraph<PersistenceSchema<T>
         }
     }
     return Array.from(results);
+}
+
+export function extractSchemaFromDef<T>(def: FieldDefinition<T, any>, schemaService: SchemaRegistryService): [AnySchema<T>, string] {
+    let schemaToken: SchemaTypeToken<T>
+    let reference: string;
+    if(def && def instanceof SchemaTypeToken) {
+        schemaToken = def
+    } else {
+        const link = def as FieldLink<any, any>;
+        schemaToken = link.type;
+        reference = link.references as string;
+    }
+    const subSchema = schemaService.fetchSchema(schemaToken);
+    return [subSchema, reference];
 }

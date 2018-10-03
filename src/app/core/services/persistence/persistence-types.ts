@@ -1,5 +1,6 @@
 import { HasId, StateBase } from "../state";
 import { UpgradeDB } from "idb";
+import { SchemaTypeToken } from "./schemaTypeToken";
 
 export interface FetchOptions {
     source: FetchSource;
@@ -8,14 +9,15 @@ export interface FetchOptions {
 
 export interface FetchCriteria<T> {
     search: {[ field in keyof T ]?: T[field] }
-    fetch?: FetchGraph<PersistenceSchema<T>>;
+    fetch?: FetchGraph<T>;
 }
 
-export type FetchGraph<T extends PersistenceSchema<any>> = {
-    [field in keyof T["fields"]]: FetchGraph<T["fields"][field]> | true
+type StripArray<T> = T extends Array<any> ? T[0] : T;
+
+export type FetchGraph<T> = {
+    [field in keyof T]?: FetchGraph<StripArray<T[field]>> | true
 }
 
-type StripAray<T> = T extends Array<any> ? T[0] : T;
 
 export interface PersistenceSchema<T> {
     type: 'top' | 'nested';
@@ -32,17 +34,24 @@ export class NestedSchema<T> implements PersistenceSchema<T> {
     constructor(public fields: FieldDefinitions<T>) { }
 }
 
+export type FieldDefinition<T, L extends keyof T> = FieldLink<T, L> | SchemaTypeToken<T>;
+
+export interface FieldLink<T, L extends keyof T> {
+    references: keyof T;
+    type: SchemaTypeToken<T[L]>
+}
+
 export type AnySchema<T> = TopLevelSchema<T> | NestedSchema<T>
 
 export type FieldDefinitions<T> = { 
     [field in keyof T]?: T[field] extends Array<any> 
-        ? AnySchema<T[field][0]> 
-        : AnySchema<T[field]> 
+        ? FieldDefinition<T, field> : FieldDefinition<T, field> 
 }
 
 export interface PersistPlan {
     groups: {
         store: string;
+        schema: TopLevelSchema<any>
         state: StateBase<any>;
         items: any[];
     }[]

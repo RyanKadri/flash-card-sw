@@ -2,8 +2,8 @@ import { BehaviorSubject, Observable, combineLatest } from "rxjs";
 import { map } from "rxjs/operators";
 import 'reflect-metadata'
 import { SchemaRegistryService } from "./persistence/schema-registry.service";
-import { FetchGraph, PersistenceSchema, TopLevelSchema, AnySchema } from "./persistence/persistence-types";
-import { extractTopLevelInfo, join } from "./static-libs";
+import { FetchGraph, PersistenceSchema, TopLevelSchema, AnySchema, FieldLink } from "./persistence/persistence-types";
+import { extractTopLevelInfo, join, extractSchemaFromDef } from "./static-libs";
 import { SchemaTypeToken } from "./persistence/schemaTypeToken";
 
 export class StateProjection<StateType extends HasId> {
@@ -69,9 +69,9 @@ export class StateProjection<StateType extends HasId> {
         return new StateProjection(this.schemaService, res, this.idField, this.type);
     }
 
-    join(join: FetchGraph<PersistenceSchema<StateType>>): StateProjection<StateType> {
+    join(join: FetchGraph<StateType>): StateProjection<StateType> {
         const schema = this.schemaService.fetchSchema(this.type) as TopLevelSchema<StateType>;
-        const states = extractTopLevelInfo(join, schema, schema => schema.metadata.localState);
+        const states = extractTopLevelInfo(join, schema, this.schemaService, schema => schema.metadata.localState);
         const stateObs = states
             .map(state => state.dataSource
                 .pipe(map(source => ({ state, source }))) 
@@ -92,46 +92,47 @@ export class StateProjection<StateType extends HasId> {
         return new StateProjection(this.schemaService, joinObs, this.idField, this.type);
     }
 
-    private joinCurrent(current: StateType[], graph: FetchGraph<PersistenceSchema<StateType>>, schema: TopLevelSchema<StateType>, stateMap: Map<StateProjection<StateType>, IdMap<StateType>>) {
-        return current.map(el => traverse(el, graph, schema));
-
-        function traverse<T>(element: T, graph: FetchGraph<any>, schema: AnySchema<any>): T {
+    private joinCurrent(current: StateType[], graph: FetchGraph<StateType>, schema: TopLevelSchema<StateType>, stateMap: Map<StateProjection<StateType>, IdMap<StateType>>) {
+        const traverse = <T>(element: T, graph: FetchGraph<any>, schema: AnySchema<any>) => {
             const newObj: Partial<T> = {};
-            for(const [key, val] of Object.entries(element)) {
-                const schemaEntry: AnySchema<any> = schema.fields[key];
+            for(const key of Object.keys(element)) {
+                const schemaEntry = schema.fields[key];
                 const graphEntry = graph[key];
                 const elementVal = element[key];
+            
                 if(!schemaEntry || !graphEntry) {
                     newObj[key] = elementVal;
                 } else {
+                    const [subSchema, ref] = extractSchemaFromDef(schemaEntry, this.schemaService);
+
                     let toTraverse;
-                    let replaceKey;
-                    if(schemaEntry.type === 'top') {
-                        const state = schemaEntry.metadata.localState;
+                    if(subSchema.type === 'top') {
+                        const state = subSchema.metadata.localState;
                         const valMap = stateMap.get(state);
-                        replaceKey = key.replace(/^_/, '');
-                        if(Array.isArray(elementVal)) {
-                            toTraverse = elementVal.map(key => valMap[key])
+                        const refValue = element[ref];
+                        if(Array.isArray(refValue)) {
+                            toTraverse = refValue.map(key => valMap[key])
                         } else {
-                            toTraverse = valMap[elementVal];
+                            toTraverse = valMap[refValue];
                         }
                     } else {
                         toTraverse = elementVal;
-                        replaceKey = key
                     }
                     if(typeof graphEntry !== 'boolean') {
                         if(Array.isArray(toTraverse)) {
-                            newObj[replaceKey] = toTraverse.map(res => traverse(res, graphEntry, schemaEntry))
+                            newObj[key] = toTraverse.map(res => traverse(res, graphEntry, subSchema))
                         } else {
-                            newObj[replaceKey] = traverse(toTraverse, graphEntry, schemaEntry);
+                            newObj[key] = traverse(toTraverse, graphEntry, subSchema);
                         }
                     } else {
-                        newObj[replaceKey] = toTraverse;
+                        newObj[key] = toTraverse;
                     }
                 }
             }
             return newObj as T;
         }
+
+        return current.map(el => traverse(el, graph, schema));
     }
 }
 

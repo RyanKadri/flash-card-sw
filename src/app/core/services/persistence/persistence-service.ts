@@ -2,10 +2,11 @@ import { Injectable } from "@angular/core";
 import { LocalPersistenceService } from "./local-persistence-service";
 import { HasId, StateBase } from "../state";
 import { RemotePersistenceService } from "./remote-persistence.service";
-import { CompletionGuarantee, FetchSource, PersistenceMetadata, PersistenceOptions, FetchCriteria, PersistenceProvider, FetchStatus, FetchResult, FetchOptions, DeleteOptions, PersistenceSchema, TopLevelSchema, AnySchema, PersistPlan, FetchGroup } from "./persistence-types";
+import { CompletionGuarantee, FetchSource, PersistenceMetadata, PersistenceOptions, FetchCriteria, PersistenceProvider, FetchStatus, FetchResult, FetchOptions, DeleteOptions, PersistenceSchema, TopLevelSchema, AnySchema, PersistPlan, FetchGroup, FieldDefinition, FieldLink } from "./persistence-types";
 import * as uuidv4 from 'uuid/v4'
 import { SchemaTypeToken } from "./schemaTypeToken";
 import { SchemaRegistryService } from "./schema-registry.service";
+import { extractSchemaFromDef } from "../static-libs";
 
 
 @Injectable({ providedIn: 'root' })
@@ -134,39 +135,41 @@ export class PersistenceService {
     }
 
     private createPersistPlan<T>(items: T[], schema: TopLevelSchema<T>) {
-        const persistMap = new Map<string, { state: StateBase<any>, items: any[]}>(); // Object Store -> Objects being persisted
-
-        items.forEach(item => persistPlan(item, schema));
-        const plan: PersistPlan = { groups: [] }
-        for(const [key, vals] of persistMap.entries()) {
-            plan.groups.push({ store: key, state: vals.state, items: vals.items });
-        }
-        return plan;
-
-        function persistPlan(item: T, schema: AnySchema<T>) {
+        const persistMap = new Map<string, { state: StateBase<any>, items: any[], schema: TopLevelSchema<any> }>(); // Object Store -> Objects being persisted
+        
+        const persistPlan = (item: T, schema: AnySchema<T>) => {
+            if(!item) return;
             const replacements = {};
             for(const entry of Object.entries(schema.fields)) {
                 const field = entry[0];
-                const graphNode = entry[1] as AnySchema<any>;
+                const graphNode = entry[1] as FieldDefinition<any, any>;
 
-                if(!item[field]) {
+                const [innerSchema, referenceField] = extractSchemaFromDef(graphNode, this.schemaRegistry);
+
+                if(!(field in item)) {
                     continue;
                 } else {
+                    let toReplace = [];
                     if(item[field] instanceof Array) {
-                        replacements[field] = item[field].map(inner => persistPlan(inner, graphNode));
+                        toReplace = item[field].map(inner => persistPlan(inner, innerSchema));
                     } else {
-                        replacements[field] = persistPlan(item[field], graphNode);
+                        toReplace = persistPlan(item[field], innerSchema);
+                    }
+                    if(referenceField) {
+                        replacements[referenceField] = toReplace;
+                        replacements[field] = undefined;
+                    } else {
+                        replacements[field] = toReplace;
                     }
                 }
             }
-            const res = Object.entries(item).reduce((acc, [field, val]) => {
-                if(replacements[field]) {
-                    acc[field] = replacements[field];
-                } else {
+            const res = {
+                ...(item as any),
+                ...Object.entries(replacements).reduce((acc, [field, val]) => {
                     acc[field] = val;
-                }
-                return acc;
-            }, {})
+                    return acc;
+                }, {})
+            };
 
             if(schema.type === 'top') {
                 const key = schema.metadata.idbObjectStore;
@@ -178,9 +181,9 @@ export class PersistenceService {
                     newItem = res;
                 }
                 if(!persistMap.has(key)) {
-                    toPersist = { state: schema.metadata.localState, items: [ newItem ] }
+                    toPersist = { state: schema.metadata.localState, items: [ newItem ], schema }
                 } else {
-                    toPersist = { state: schema.metadata.localState, items: [...persistMap.get(key).items, newItem]}
+                    toPersist = { state: schema.metadata.localState, items: [...persistMap.get(key).items, newItem], schema}
                 }
                 persistMap.set(key, toPersist);
                 return newItem['id'];
@@ -188,6 +191,14 @@ export class PersistenceService {
                 return res;
             }
         }
+
+        items.forEach(item => persistPlan(item, schema));
+        const plan: PersistPlan = { groups: [] }
+        for(const [key, vals] of persistMap.entries()) {
+            plan.groups.push({ store: key, state: vals.state, items: vals.items, schema: vals.schema });
+        }
+        return plan;
+
     }
 
     private assertTopLevelSchema<T>(schema: AnySchema<T>): TopLevelSchema<T> {

@@ -27,7 +27,7 @@
     </mat-form-field>
     <hr *ngIf="editing || currentSide.image" />
     <div class="image-container" *ngIf="editing || currentSide.image">
-        <img *ngIf="currentSide.image" [src]="currentSide.image.url | safeUrl" height="100%" />
+        <img *ngIf="currentSide.image" [src]="currentSide.image.url | safeUrl" height="100%" (click)="flip()" />
         <button class="source" *ngIf="editing && !currentSide.image" mat-icon-button (click)="fileUpload.click()">
             <mat-icon>image</mat-icon>
         </button> 

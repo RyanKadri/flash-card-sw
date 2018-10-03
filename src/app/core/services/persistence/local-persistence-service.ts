@@ -1,9 +1,11 @@
 import { Injectable } from "@angular/core";
-import idb, { Transaction } from 'idb';
+import idb, { Transaction, ObjectStore } from 'idb';
 import { HasId } from "../state";
-import { PersistenceProvider, FetchCriteria, FetchStatus, FetchGraph, PersistenceSchema, TopLevelSchema, AnySchema, FieldDefinitions, PersistPlan } from "./persistence-types";
+import { PersistenceProvider, FetchCriteria, FetchStatus, FetchGraph, PersistenceSchema, TopLevelSchema, AnySchema, FieldDefinitions, PersistPlan, FieldLink } from "./persistence-types";
 import { IdbEvolutionService } from "./idb-evolution.service";
-import { extractTopLevelInfo } from "../static-libs";
+import { extractTopLevelInfo, extractSchemaFromDef } from "../static-libs";
+import { SchemaTypeToken } from "./schemaTypeToken";
+import { SchemaRegistryService } from "./schema-registry.service";
 
 const nav: Navigator & {storage: 
     { persist: () => Promise<boolean>, persisted: () => Promise<boolean> }} = window.navigator as any
@@ -14,7 +16,8 @@ export class LocalPersistenceService implements PersistenceProvider {
     private databaseVersion: number;
 
     constructor(
-        private evolutionService: IdbEvolutionService
+        private evolutionService: IdbEvolutionService,
+        private schemaService: SchemaRegistryService
     ) { }
 
     async initialize() {
@@ -39,7 +42,7 @@ export class LocalPersistenceService implements PersistenceProvider {
         for(const group of plan.groups) {
             const store = tx.objectStore(group.store);
             group.items.forEach(val => {
-                toPersist.push(store.put(val));
+                toPersist.push(this.putToStore(store, val, group.schema));
             })
         }
         await Promise.all(toPersist);
@@ -49,9 +52,8 @@ export class LocalPersistenceService implements PersistenceProvider {
 
     async fetch<T extends HasId>(schema: TopLevelSchema<T>, criteria: FetchCriteria<T>) {
         const db = await idb.open(schema.metadata.idbDatabase, this.databaseVersion);
-        const stores = extractTopLevelInfo(criteria.fetch, schema, schema => schema.metadata.idbObjectStore);
-        
-        console.log(stores);
+        const stores = extractTopLevelInfo(criteria.fetch, schema, this.schemaService, schema => schema.metadata.idbObjectStore);
+
         const tx = db.transaction(stores, 'readonly');
         const initStore = tx.objectStore(stores[0]);
         let initRes;
@@ -70,37 +72,40 @@ export class LocalPersistenceService implements PersistenceProvider {
         return graph;
     }
 
-    private async fetchLinked<T>(tx: Transaction, startingFrom: T[], fetch: FetchGraph<PersistenceSchema<T>>, schema: TopLevelSchema<T>) {
+    private async fetchLinked<T>(tx: Transaction, startingFrom: T[], fetch: FetchGraph<T>, schema: TopLevelSchema<T>) {
         const fetchMap = new Map<TopLevelSchema<any>, any[]>();
         fetchMap.set(schema, startingFrom);
+
         if(fetch) {
-            await traverse(startingFrom, fetch, schema);
-        }
-
-        async function traverse(items: T[], fetch: FetchGraph<any>, schema: AnySchema<T>) {
-            for(const entry of Object.entries(fetch)) {
-                const key = entry[0];
-                const subgraph = entry[1] as FetchGraph<any>;
-
-                const nestedSchema = schema.fields[key] as AnySchema<any>;
-                if(nestedSchema.type === 'top') {
-                    const store = tx.objectStore(nestedSchema.metadata.idbObjectStore);
-                    const toFetch = unpack(items, key)
-                        .map(el => store.get(el));
-                    const children = await Promise.all(toFetch);
-                    children.forEach(child => {
-                        fetchMap.set(nestedSchema, (fetchMap.get(child.id) || []).concat(child));
-                    })
-                    if(typeof subgraph !== 'boolean' && typeof subgraph !== 'undefined') {
-                        await traverse(children, subgraph, nestedSchema);
-                    }
-                } else {
-                    const children = unpack(items, key);
-                    if(typeof subgraph !== 'boolean' && typeof subgraph !== 'undefined') {
-                        await traverse(children, subgraph, nestedSchema);
+            const traverse = async (items: T[], fetch: FetchGraph<any>, schema: AnySchema<T>) => {
+                for(const entry of Object.entries(fetch)) {
+                    const key = entry[0];
+                    const subgraph = entry[1] as FetchGraph<any>;
+    
+                    const fieldDef = schema.fields[key as keyof T];
+                    const [nestedSchema, fieldRef] = extractSchemaFromDef(fieldDef, this.schemaService);
+    
+                    if(nestedSchema.type === 'top') {
+                        const store = tx.objectStore(nestedSchema.metadata.idbObjectStore);
+                        const toFetch = unpack(items, fieldRef)
+                            .map(el => this.getFromStore(store, el, nestedSchema));
+                        const children = await Promise.all(toFetch);
+                        children.forEach(child => {
+                            fetchMap.set(nestedSchema, (fetchMap.get(nestedSchema) || []).concat(child));
+                        })
+                        if(typeof subgraph !== 'boolean' && typeof subgraph !== 'undefined') {
+                            await traverse(children, subgraph, nestedSchema as any);
+                        }
+                    } else {
+                        const children = unpack(items, key);
+                        if(typeof subgraph !== 'boolean' && typeof subgraph !== 'undefined') {
+                            await traverse(children, subgraph, nestedSchema);
+                        }
                     }
                 }
             }
+
+            await traverse.bind(this)(startingFrom, fetch, schema);
         }
 
         function unpack(items: T[], key: string): any[] {
@@ -127,6 +132,25 @@ export class LocalPersistenceService implements PersistenceProvider {
                 schema, results: items
             }))
         };
+    }
+
+    private getFromStore(store: ObjectStore<any, any>, id: string, schema: TopLevelSchema<any>) {
+        const getPromise = store.get(id);
+        if(schema.metadata.idbAfterFetch) {
+            return getPromise.then(item => schema.metadata.idbAfterFetch(item));
+        } else {
+            return getPromise;
+        }
+    }
+
+    private putToStore(store: ObjectStore<any, any>, item: any, schema: TopLevelSchema<any>) {
+        let toPersist;
+        if(schema.metadata.idbBeforePersist) {
+            toPersist = schema.metadata.idbBeforePersist(item);
+        } else {
+            toPersist = item;
+        }
+        return store.put(toPersist);
     }
 
     async delete<T extends HasId>(items: T[], schema: TopLevelSchema<T>) {

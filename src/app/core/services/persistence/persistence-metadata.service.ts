@@ -22,7 +22,6 @@ export class PersistenceMetadataService {
             idbObjectStore: 'quiz-info',
     
             localState: quizState,
-            
 
             remoteResource: (quiz) => `/api/quizzes/${quiz.id}`,
             remoteResourceBulk: '/api/quizzes'
@@ -31,8 +30,8 @@ export class PersistenceMetadataService {
         this.imageSchema = {
             idbDatabase: 'quizzes',
             idbObjectStore: 'quiz-images',
-            idbBeforePersist: (image) => ({ data: image.data }),
-            idbAfterFetch: (image) => ({ ...image, url: URL.createObjectURL(image.data), data: undefined, type: image.data.type }),
+            idbBeforePersist: (image) => ({ data: image.data, id: image.id }),
+            idbAfterFetch: (image) => ({ ...image, url: URL.createObjectURL(image.data), type: image.data.type }),
 
             localState: imageState,
 

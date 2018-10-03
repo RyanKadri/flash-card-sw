@@ -16,7 +16,7 @@ export class QuizService {
     }
 
     fetchQuiz(id: string) {
-        const fetch: FetchGraph<TopLevelSchema<QuizInfo>> = {
+        const fetch: FetchGraph<QuizInfo> = {
             cards: {
                 term: { image: true },
                 definition: { image: true },

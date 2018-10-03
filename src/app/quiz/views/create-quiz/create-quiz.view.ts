@@ -54,10 +54,12 @@ export class CreateQuizView implements OnInit {
                 .where({
                     id: this.route.snapshot.params.quizId
                 })
-                .join({ cards: {
-                    term: { image: true },
-                    definition: { image: true }
-                }})
+                .join({ 
+                    cards: {
+                        term: { image: true },
+                        definition: { image: true }
+                    }
+                })
                 .select({ unique: true })
                 .subscribe(quiz => {
                     this.quiz = quiz;

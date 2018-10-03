@@ -26,11 +26,16 @@ export class PlayQuizView implements OnInit {
   }
 
   ngOnInit() {
-    combineLatest(
-      this.route.params, this.quizState.select(),
-        (params, quizzes) => quizzes.find(quiz => quiz.id = params.quizId)
-    ).subscribe(quiz => {
+    this.quizState.where({
+      id: this.route.snapshot.params.quizId
+    }).join({
+      cards: {
+        term: { image: true },
+        definition: { image: true} 
+      }
+    }).select({ unique: true })
+    .subscribe(quiz => {
       this.quiz = quiz;
-    });
+    })
   }
 }

@@ -5,6 +5,7 @@ export interface FlashCardInfo {
 
 export interface FlashCardSide {
     value: string;
+    _image?: string;
     image?: ImageInfo;
 }
 
