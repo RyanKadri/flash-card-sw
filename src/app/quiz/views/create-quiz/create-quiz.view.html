@@ -1,5 +1,5 @@
 <quiz-metadata *ngIf="!editMetadata || !largeScreen" class="color-primary-light" 
-    [quizMetaData]="quiz" (edit)="edit()"></quiz-metadata>
+    [quizMetaData]="quiz" (edit)="edit()" (play)="play()"></quiz-metadata>
 <edit-quiz-details [details]="quiz" (save)="updateDetails($event)"
     class="mat-elevation-z3" [ngClass]="{ collapse: !editMetadata }"></edit-quiz-details>
 <section class="card-section">

@@ -17,4 +17,6 @@ export class QuizMetadataComponent {
   @Output()
   save = new EventEmitter<void>();
 
+  @Output()
+  play = new EventEmitter<void>();
 }

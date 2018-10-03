@@ -73,6 +73,11 @@ export class CreateQuizView implements OnInit {
         this.editMetadata = true;
     }
 
+    play() {
+        this.quickSave();
+        this.router.navigate(['/play', this.quiz.id])
+    }
+
     save() {
         this.quizService.saveQuiz(this.quiz);
         this.router.navigate(['/browse'])

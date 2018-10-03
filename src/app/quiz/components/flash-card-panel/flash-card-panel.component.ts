@@ -3,6 +3,7 @@ import { FlashCardInfo, FlashCardSide } from "../../types/flash-card.types";
 import { trigger, state, style, transition, animate, sequence } from "@angular/animations";
 import { DomSanitizer, SafeStyle } from "@angular/platform-browser";
 import { ImageService } from "../../services/image-service";
+import { Converter } from "showdown";
 
 @Component({
     selector: 'flash-card-panel',
@@ -65,6 +66,13 @@ export class FlashCardPanel implements OnInit, OnChanges {
         return this.termSide ? this._card.term : this._card.definition;
     }
 
+    get currentText() {
+        const converter = new Converter();
+        const html = converter.makeHtml(this.currentSide.value);
+        console.log(html);
+        return html;
+    }
+
     ngOnInit() {
     }
     
@@ -91,11 +99,13 @@ export class FlashCardPanel implements OnInit, OnChanges {
         }
     }
 
-    pressEnter() {
-        if((this.termSide && !this.card.definition.value) || (!this.termSide && !this.card.term.value)) {
-            this.flip();
-        } else {
-            this._save();
+    pressEnter(e: KeyboardEvent) {
+        if(!e.shiftKey) {
+            if((this.termSide && !this.card.definition.value) || (!this.termSide && !this.card.term.value)) {
+                this.flip();
+            } else {
+                this._save();
+            }
         }
     }
 

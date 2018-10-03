@@ -8,6 +8,19 @@ import { trigger, state, style, transition, animate } from '@angular/animations'
   styleUrls: ['./quiz-game-area.component.scss'],
   encapsulation: ViewEncapsulation.Emulated,
   changeDetection: ChangeDetectionStrategy.Default,
+  animations: [
+    trigger('cardState', [
+      transition('void => *', [
+        style({
+          transform: 'translateX(-100%)'
+        }),
+        animate('500ms ease-out')
+      ]),
+      transition('* => void', [
+        animate('500ms ease-in', style({ transform: 'translateX(100%' }))
+      ])
+    ])
+  ]
 })
 export class QuizGameCardComponent implements OnInit {
 

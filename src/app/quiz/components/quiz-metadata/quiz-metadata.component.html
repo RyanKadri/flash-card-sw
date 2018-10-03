@@ -4,5 +4,5 @@
 </button>
 <mat-menu #options="matMenu">
   <button mat-menu-item (click)="edit.emit()">Edit Details</button>
-  <button mat-menu-item>Preview</button>
+  <button mat-menu-item (click)="play.emit()">Preview</button>
 </mat-menu>

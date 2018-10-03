@@ -16,14 +16,13 @@
     </ng-container>
 
     <!-- Card Details -->
-    <header *ngIf="!editing">
-        {{ currentSide.value }}
+    <header *ngIf="!editing" [innerHtml]="currentText">
     </header>
     <mat-form-field *ngIf="editing">
-        <input autofocus name="term" matInput 
+        <textarea name="term" matInput matTextareaAutosize
                 [placeholder]="termSide ? 'Term' : 'Definition'"
                 [(ngModel)]="currentSide.value"
-                (keydown.enter)="pressEnter()">
+                (keydown.enter)="pressEnter($event)"></textarea>
     </mat-form-field>
     <hr *ngIf="editing || currentSide.image" />
     <div class="image-container" *ngIf="editing || currentSide.image">
